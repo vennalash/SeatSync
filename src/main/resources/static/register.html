@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync | Register</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #5546e8, #9185ff);
+        }
+
+        .register-box {
+            background: white;
+            width: 100%;
+            max-width: 430px;
+            padding: 38px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px #00000020;
+        }
+
+        .logo {
+            text-align: center;
+            color: #5546e8;
+            font-size: 29px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #172033;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #5546e8;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 24px;
+            border: none;
+            border-radius: 8px;
+            background: #5546e8;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4335cf;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 22px;
+            line-height: 2;
+            color: #666;
+        }
+
+        a {
+            color: #5546e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="register-box">
+    <div class="logo">SeatSync.</div>
+
+    <h2>Create Account</h2>
+    <p class="subtitle">Join SeatSync and start exploring.</p>
+
+    <form id="registerForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name"
+               placeholder="Enter your full name" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email"
+               placeholder="Enter your email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password"
+               placeholder="Create a password"
+               minlength="8" required>
+
+        <button type="submit" id="registerButton">
+            Create Account
+        </button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <div class="links">
+        Already have an account?
+        <a href="login.html">Login</a>
+        <br>
+        <a href="/">Back to Home</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById("registerForm").addEventListener(
+        "submit", async function(event) {
+            event.preventDefault();
+
+            const message = document.getElementById("message");
+            const button = document.getElementById("registerButton");
+
+            button.disabled = true;
+            message.style.color = "#555";
+            message.textContent = "Creating your account...";
+
+            try {
+                const response = await fetch("/api/users/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: document.getElementById("name").value.trim(),
+                        email: document.getElementById("email").value.trim(),
+                        password: document.getElementById("password").value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    message.style.color = "green";
+                    message.textContent =
+                        "Registration successful! Redirecting to login...";
+
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 1500);
+                } else {
+                    message.style.color = "red";
+                    message.textContent =
+                        data.message || "Registration failed. Try another email.";
+                }
+            } catch (error) {
+                message.style.color = "red";
+                message.textContent = "Unable to connect to the server.";
+            } finally {
+                button.disabled = false;
+            }
+        }
+    );
+</script>
+
+</body>
+</html>

@@ -1,0 +1,739 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync - Booking Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20213a;
+}
+
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: #17152f;
+    color: white;
+    position: fixed;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #aaa5dc;
+    font-size: 12px;
+    margin-bottom: 50px;
+}
+
+.menu-label {
+    color: #9893c4;
+    font-size: 11px;
+    margin: 20px 10px 15px;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 13px;
+    border-radius: 9px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #6553df;
+}
+
+.logout {
+    margin-top: auto;
+    border: 1px solid #514b75;
+    text-align: center;
+    cursor: pointer;
+}
+
+.main {
+    margin-left: 240px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 27px;
+}
+
+.header p {
+    color: #777;
+    margin-top: 7px;
+}
+
+.admin {
+    background: white;
+    padding: 15px 22px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 23px;
+    border-radius: 14px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.stat-card p {
+    color: #777;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    font-size: 27px;
+    margin-top: 12px;
+}
+
+.content {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.filters input,
+.filters select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    background: white;
+}
+
+.filters input {
+    width: 280px;
+}
+
+button {
+    border: none;
+    padding: 9px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.refresh {
+    background: #6553df;
+    color: white;
+    padding: 11px 17px;
+}
+
+.cancel {
+    background: #ffe5e5;
+    color: #d92525;
+}
+
+.details {
+    background: #ece9ff;
+    color: #5743ce;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+th {
+    background: #f6f5fb;
+    text-align: left;
+    padding: 15px 12px;
+    color: #555;
+    font-size: 13px;
+}
+
+td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+tr:hover {
+    background: #fafaff;
+}
+
+.status {
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.PENDING {
+    background: #fff1d6;
+    color: #bd7900;
+}
+
+.CONFIRMED {
+    background: #d9f8e9;
+    color: #008b50;
+}
+
+.CANCELLED {
+    background: #ffe1e1;
+    color: #d62828;
+}
+
+.actions {
+    display: flex;
+    gap: 7px;
+}
+
+.empty {
+    text-align: center;
+    padding: 35px;
+    color: #888;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 10;
+}
+
+.modal-box {
+    background: white;
+    padding: 28px;
+    width: 450px;
+    max-width: 100%;
+    border-radius: 15px;
+}
+
+.modal-box h2 {
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    padding: 11px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.detail-row strong {
+    display: inline-block;
+    width: 145px;
+}
+
+.close {
+    background: #6553df;
+    color: white;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.message {
+    padding: 15px;
+    color: #c33;
+    text-align: center;
+}
+
+@media(max-width: 900px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        margin-left: 190px;
+        padding: 20px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .header {
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">SeatSync.</div>
+    <div class="subtitle">ADMINISTRATION PANEL</div>
+
+    <div class="menu-label">MAIN MENU</div>
+
+    <a href="/admin.html">◇ Overview</a>
+
+    <div class="menu-label">MANAGEMENT</div>
+
+    <a href="/admin-movies.html">🎬 Movies</a>
+    <a href="/admin-events.html">🎟 Events</a>
+    <a href="/admin-hotels.html">🏨 Hotels</a>
+    <a href="/admin-sports.html">🏆 Sports</a>
+    <a href="/admin-bookings.html" class="active">📋 Bookings</a>
+    <a href="/admin-users.html">👥 Users</a>
+
+    <a class="logout" onclick="logout()">↪ Logout</a>
+
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>Booking Management 📋</h1>
+            <p>View and manage all customer reservations.</p>
+        </div>
+
+        <div class="admin">SeatSync Admin</div>
+    </div>
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <p>Total Bookings</p>
+            <h2 id="totalCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Pending</p>
+            <h2 id="pendingCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Confirmed</p>
+            <h2 id="confirmedCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Cancelled</p>
+            <h2 id="cancelledCount">0</h2>
+        </div>
+
+    </div>
+
+    <section class="content">
+
+        <div class="content-header">
+            <h2>All Bookings</h2>
+            <button class="refresh" onclick="loadBookings()">
+                ↻ Refresh
+            </button>
+        </div>
+
+        <div class="filters">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search reference or customer..."
+                oninput="applyFilters()">
+
+            <select id="serviceFilter" onchange="applyFilters()">
+                <option value="">All Services</option>
+                <option value="MOVIE">Movies</option>
+                <option value="EVENT">Events</option>
+                <option value="HOTEL">Hotels</option>
+                <option value="SPORTS">Sports</option>
+            </select>
+
+            <select id="statusFilter" onchange="applyFilters()">
+                <option value="">All Status</option>
+                <option value="PENDING">Pending</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="CANCELLED">Cancelled</option>
+            </select>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Reference</th>
+                        <th>Customer</th>
+                        <th>Service</th>
+                        <th>Amount</th>
+                        <th>Seats</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="bookingTable">
+                    <tr>
+                        <td colspan="9" class="empty">
+                            Loading bookings...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<div class="modal" id="detailsModal">
+    <div class="modal-box">
+
+        <h2>Booking Details</h2>
+
+        <div id="bookingDetails"></div>
+
+        <button class="close" onclick="closeModal()">
+            Close
+        </button>
+
+    </div>
+</div>
+
+<script>
+
+let allBookings = [];
+
+const money = amount =>
+    "₹" + Number(amount || 0).toFixed(2);
+
+function formatDate(date) {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleString("en-IN");
+}
+
+async function loadBookings() {
+
+    const table = document.getElementById("bookingTable");
+
+    table.innerHTML =
+        '<tr><td colspan="9" class="empty">Loading bookings...</td></tr>';
+
+    try {
+
+        const response = await fetch(
+            "/api/bookings/admin/all",
+            { credentials: "same-origin" }
+        );
+
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error("Admin access denied. Please login again.");
+            }
+
+            throw new Error("Unable to load bookings.");
+        }
+
+        allBookings = await response.json();
+
+        updateStats();
+        applyFilters();
+
+    } catch (error) {
+
+        table.innerHTML =
+            `<tr><td colspan="9" class="message">${escapeHTML(error.message)}</td></tr>`;
+
+    }
+}
+
+function updateStats() {
+
+    document.getElementById("totalCount").textContent =
+        allBookings.length;
+
+    document.getElementById("pendingCount").textContent =
+        allBookings.filter(b => b.status === "PENDING").length;
+
+    document.getElementById("confirmedCount").textContent =
+        allBookings.filter(b => b.status === "CONFIRMED").length;
+
+    document.getElementById("cancelledCount").textContent =
+        allBookings.filter(b => b.status === "CANCELLED").length;
+}
+
+function applyFilters() {
+
+    const keyword =
+        document.getElementById("searchInput").value.trim().toLowerCase();
+
+    const service =
+        document.getElementById("serviceFilter").value;
+
+    const status =
+        document.getElementById("statusFilter").value;
+
+    const filtered = allBookings.filter(b => {
+
+        const reference =
+            (b.bookingReference || "").toLowerCase();
+
+        const customer =
+            (b.customerName || "").toLowerCase();
+
+        const matchesKeyword =
+            reference.includes(keyword) ||
+            customer.includes(keyword);
+
+        const matchesService =
+            !service || b.serviceType === service;
+
+        const matchesStatus =
+            !status || b.status === status;
+
+        return matchesKeyword && matchesService && matchesStatus;
+    });
+
+    displayBookings(filtered);
+}
+
+function displayBookings(bookings) {
+
+    const table = document.getElementById("bookingTable");
+
+    if (bookings.length === 0) {
+        table.innerHTML =
+            '<tr><td colspan="9" class="empty">No bookings found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = bookings.map(b => {
+
+        const status = b.status || "PENDING";
+
+        return `
+        <tr>
+
+            <td>${escapeHTML(b.id)}</td>
+
+            <td><strong>${escapeHTML(b.bookingReference)}</strong></td>
+
+            <td>${escapeHTML(b.customerName)}</td>
+
+            <td>${escapeHTML(b.serviceType)}</td>
+
+            <td>${money(b.totalAmount)}</td>
+
+            <td>${escapeHTML(b.seats || "-")}</td>
+
+            <td>${formatDate(b.bookingTime)}</td>
+
+            <td>
+                <span class="status ${status}">
+                    ${escapeHTML(status)}
+                </span>
+            </td>
+
+            <td>
+                <div class="actions">
+
+                    <button class="details"
+                        onclick="showDetails(${Number(b.id)})">
+                        View
+                    </button>
+
+                    ${
+                        status !== "CANCELLED"
+                        ? `<button class="cancel"
+                            onclick="cancelBooking('${encodeURIComponent(b.bookingReference || "")}')">
+                            Cancel
+                           </button>`
+                        : ""
+                    }
+
+                </div>
+            </td>
+
+        </tr>
+        `;
+
+    }).join("");
+}
+
+function showDetails(id) {
+
+    const booking = allBookings.find(b => Number(b.id) === id);
+
+    if (!booking) return;
+
+    const fields = [
+        ["Booking ID", booking.id],
+        ["Reference", booking.bookingReference],
+        ["Customer", booking.customerName],
+        ["Service Type", booking.serviceType],
+        ["Service ID", booking.serviceId],
+        ["Show ID", booking.showId],
+        ["Total Amount", money(booking.totalAmount)],
+        ["Selected Seats", booking.seats || "-"],
+        ["Booking Date", formatDate(booking.bookingTime)],
+        ["Status", booking.status]
+    ];
+
+    document.getElementById("bookingDetails").innerHTML =
+        fields.map(([label, value]) => `
+            <div class="detail-row">
+                <strong>${escapeHTML(label)}:</strong>
+                ${escapeHTML(value)}
+            </div>
+        `).join("");
+
+    document.getElementById("detailsModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("detailsModal").style.display = "none";
+}
+
+async function cancelBooking(encodedReference) {
+
+    const reference = decodeURIComponent(encodedReference);
+
+    if (!confirm("Are you sure you want to cancel booking " + reference + "?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/bookings/admin/" +
+            encodeURIComponent(reference) +
+            "/cancel",
+            {
+                method: "PUT",
+                credentials: "same-origin"
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Cancellation failed.");
+        }
+
+        alert("Booking cancelled successfully!");
+
+        await loadBookings();
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+function escapeHTML(value) {
+    return String(value ?? "-").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+async function logout() {
+
+    try {
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+    } finally {
+        sessionStorage.clear();
+        window.location.href = "/login.html";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    if (
+        !sessionStorage.getItem("seatsyncUserId") ||
+        sessionStorage.getItem("seatsyncRole") !== "ADMIN"
+    ) {
+        window.location.href = "/login.html";
+        return;
+    }
+
+    loadBookings();
+
+});
+
+</script>
+
+</body>
+</html>

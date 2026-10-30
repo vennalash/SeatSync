@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SeatSync</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5fb;
+            color: #222;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 55px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px #00000012;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            margin: 18px 0 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        input:disabled {
+            background: #eee;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 18px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>SeatSync</h2>
+    <a href="index.html">Home</a>
+</header>
+
+<div class="container">
+    <h1>My Profile</h1>
+    <p class="subtitle">View and update your account details</p>
+
+    <form id="profileForm">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" required>
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <p id="message"></p>
+
+    <a href="history.html" class="back">View My Bookings</a>
+</div>
+
+<script>
+    const userId = sessionStorage.getItem("seatsyncUserId");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const message = document.getElementById("message");
+
+    async function loadProfile() {
+        if (!userId) {
+            message.style.color = "red";
+            message.textContent =
+                "Please log in again to view your profile.";
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/users/profile/${encodeURIComponent(userId)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Could not load profile");
+            }
+
+            nameInput.value = data.name || "";
+            emailInput.value = data.email || "";
+        } catch (error) {
+            message.style.color = "red";
+            message.textContent = error.message;
+        }
+    }
+
+    document.getElementById("profileForm")
+        .addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            if (!userId) {
+                message.style.color = "red";
+                message.textContent = "Please log in again.";
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `/api/users/profile/${encodeURIComponent(userId)}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: nameInput.value.trim(),
+                            email: emailInput.value.trim()
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Profile update failed");
+                }
+
+                nameInput.value = data.name;
+                emailInput.value = data.email;
+
+                sessionStorage.setItem("seatsyncName", data.name);
+                sessionStorage.setItem("seatsyncEmail", data.email);
+
+                message.style.color = "green";
+                message.textContent = "Profile updated successfully!";
+            } catch (error) {
+                message.style.color = "red";
+                message.textContent = error.message;
+            }
+        });
+
+    loadProfile();
+</script>
+
+</body>
+</html>

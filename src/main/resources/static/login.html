@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync | Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #5546e8, #9185ff);
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px #00000020;
+        }
+
+        .logo {
+            color: #5546e8;
+            font-size: 29px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #172033;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #5546e8;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 8px;
+            background: #5546e8;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4335cf;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 22px;
+            color: #666;
+            line-height: 2;
+        }
+
+        a {
+            color: #5546e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-box">
+
+        <div class="logo">SeatSync.</div>
+
+        <h2>Welcome Back!</h2>
+
+        <p class="subtitle">Sign in to continue your journey.</p>
+
+        <form id="loginForm">
+
+            <label for="email">Email Address</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit" id="loginButton">Login</button>
+
+        </form>
+
+        <p id="message" role="status"></p>
+
+        <div class="links">
+            Don't have an account?
+            <a href="register.html">Register</a>
+            <br>
+            <a href="/">Back to Home</a>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const message = document.getElementById("message");
+                const button = document.getElementById("loginButton");
+
+                button.disabled = true;
+                message.style.color = "#555";
+                message.textContent = "Signing in...";
+
+                try {
+                    const response = await fetch("/api/users/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: document.getElementById("email").value.trim(),
+                            password: document.getElementById("password").value
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+
+                        // Save logged-in user's details
+                        if (data.id == null) {
+                            throw new Error(
+                                "User ID missing from login response. Update UserController.java."
+                            );
+                        }
+
+                        sessionStorage.setItem(
+                            "seatsyncUserId", String(data.id)
+                        );
+
+                        sessionStorage.setItem(
+                            "seatsyncName", data.name
+                        );
+
+                        sessionStorage.setItem(
+                            "seatsyncEmail", data.email
+                        );
+                        sessionStorage.setItem("seatsyncRole", data.role || "CUSTOMER");
+
+                        message.style.color = "green";
+                        message.textContent =
+                            "Login successful! Redirecting...";
+
+                        setTimeout(function () {
+                            if (data.role === "ADMIN") {
+                                window.location.href = "/admin.html";
+                            } else {
+                                window.location.href = "/dashboard.html";
+                            }
+                        }, 1000);
+
+                    } else {
+                        message.style.color = "red";
+                        message.textContent =
+                            data.message || "Login failed. Check your details.";
+                    }
+
+                } catch (error) {
+                    message.style.color = "red";
+                    message.textContent =
+                        error.message || "Unable to connect to the server.";
+                } finally {
+                    button.disabled = false;
+                }
+            }
+        );
+    </script>
+
+</body>
+</html>

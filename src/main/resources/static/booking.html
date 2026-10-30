@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync - Booking</title>
+
+<style>
+*{box-sizing:border-box}
+:root{--purple:#29204f;--primary:#6554e8;--light:#f3f0ff;--text:#292443;--muted:#77748a}
+body{font-family:Arial,sans-serif;background:#f4f3fb;margin:0;color:var(--text)}
+header{background:var(--purple);color:white;padding:16px 7%;display:flex;align-items:center;justify-content:space-between}
+header a{color:white;text-decoration:none}
+header h2{margin:0;letter-spacing:.5px}
+header span{font-size:12px;color:#d4ccff}
+.booking-box{max-width:720px;margin:35px auto;background:white;padding:30px;border-radius:18px;box-shadow:0 10px 35px #29204f12}
+h1{margin:0 0 10px}
+label{display:block;margin-top:18px;font-weight:bold}
+input[type=text],input[type=date],input[type=number],input[type=time]{width:100%;padding:13px;margin-top:8px;border:1px solid #d9d6e6;border-radius:9px;font-size:16px;background:white}
+input[type=radio]{margin-right:9px}
+button,.action-link{display:inline-block;text-align:center;margin-top:18px;padding:13px 18px;background:var(--primary);color:white;border:0;border-radius:9px;cursor:pointer;text-decoration:none;font-size:15px;font-weight:bold}
+button:hover,.action-link:hover{filter:brightness(.95)}
+button:disabled{opacity:.6;cursor:not-allowed}
+#bookButton,#payButton{width:100%}
+#showInfo{background:var(--light);padding:15px;border-radius:10px;line-height:1.9;margin:16px 0;font-size:14px}
+#seatInfo{font-weight:bold}
+#message,#paymentMessage{margin-top:18px;overflow-wrap:anywhere;line-height:1.7}
+.payment-option{display:flex;align-items:center;gap:6px;background:#faf9ff;border:1px solid #ebe8fa;padding:14px;border-radius:9px;margin-top:10px}
+#paymentSection h2{margin-bottom:8px}
+#confirmation{display:none;margin-top:28px;border:1px solid #e2def6;border-radius:18px;overflow:hidden;box-shadow:0 12px 35px #29204f12}
+.ticket-header{background:linear-gradient(135deg,#29204f,#5945a8);color:white;padding:28px 22px;text-align:center}
+.ticket-header .brand{font-size:12px;letter-spacing:3px;color:#d9d0ff;font-weight:bold;margin-bottom:12px}
+.ticket-header h2{font-size:28px;margin:0 0 8px}
+.ticket-header p{margin:0;color:#e3ddff;font-size:14px}
+.ticket-body{padding:25px}
+.confirmed-banner{text-align:center;margin-bottom:22px}
+.status{display:inline-block;padding:8px 15px;border-radius:30px;font-size:12px;font-weight:bold;letter-spacing:.7px}
+.status.pending{background:#fff0c2;color:#7d5700}
+.status.confirmed{background:#d8f8e7;color:#087445}
+.status.cancelled{background:#ffe1e1;color:#a51c1c}
+.status.expired{background:#e8e8ed;color:#444}
+.movie-panel{display:flex;align-items:center;gap:18px;padding:18px;background:#f8f6ff;border-radius:13px;margin-bottom:20px}
+#ticketPosterContainer{display:none;flex:0 0 105px}
+#ticketPoster{width:105px;height:145px;object-fit:cover;border-radius:9px}
+.movie-info{min-width:0;flex:1}
+.movie-info .eyebrow{font-size:11px;color:var(--muted);letter-spacing:1.5px;font-weight:bold}
+#ticketMovie{font-size:21px;margin:8px 0;font-weight:bold;overflow-wrap:anywhere}
+.movie-info p{font-size:13px;color:var(--muted);margin:5px 0}
+.reference{border:1px dashed #b7aef0;background:#faf9ff;padding:19px;border-radius:12px;text-align:center;margin-bottom:22px;overflow-wrap:anywhere}
+.reference-label{font-size:11px;color:var(--muted);letter-spacing:2px;font-weight:bold;margin-bottom:8px}
+#ticketReference{font-size:23px;letter-spacing:2px;color:#5040bd}
+#qrContainer{margin-top:12px}
+#ticketQr{display:block;width:125px;height:125px;object-fit:contain;margin:12px auto 7px;background:white;padding:5px;border:1px solid #e5e3ef;border-radius:7px}
+#qrContainer small{font-size:11px;color:var(--muted)}
+.section-title{font-size:12px;color:#77708e;letter-spacing:1.5px;font-weight:bold;margin:22px 0 8px}
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.detail{background:#faf9ff;border:1px solid #efedf8;padding:13px;border-radius:9px;min-width:0}
+.detail span{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}
+.detail strong{font-size:14px;overflow-wrap:anywhere}
+.seat-panel{margin-top:15px;background:#f0edff;padding:17px;border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seat-panel span{font-size:12px;color:#635a91}
+.seat-panel strong{color:#4e3cc1;font-size:17px;overflow-wrap:anywhere;text-align:right}
+.payment-row{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px dashed #ddd}
+.payment-row span{color:var(--muted);font-size:13px}
+.payment-row strong{text-align:right;overflow-wrap:anywhere;font-size:13px}
+.total-row{margin-top:12px;background:#29204f;color:white;padding:18px;border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.total-row span{font-size:13px;color:#e1dbff}
+.total-row strong{font-size:23px}
+.ticket-note{text-align:center;font-size:11px;color:var(--muted);line-height:1.7;margin-top:20px}
+.ticket-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ticket-actions button,.ticket-actions a{flex:1;min-width:130px;margin-top:17px}
+.secondary{background:#eeebff;color:#4d3ab7}
+.coupon-box{margin-top:20px;padding:16px;background:white;border-radius:10px}
+.coupon-box p{line-height:1.7}
+.coupon-summary{line-height:2;margin-top:15px}
+.coupon-summary h3{margin-bottom:0}
+@media(max-width:640px){
+header{padding:15px 5%}
+.booking-box{margin:18px 10px;padding:19px}
+.ticket-body{padding:15px}
+.ticket-header{padding:23px 15px}
+.ticket-header h2{font-size:24px}
+.movie-panel{gap:12px;padding:12px}
+#ticketPosterContainer{flex-basis:82px}
+#ticketPoster{width:82px;height:120px}
+#ticketMovie{font-size:17px}
+#ticketReference{font-size:19px}
+.details-grid{gap:8px}
+.detail{padding:10px}
+.detail strong{font-size:12px}
+.seat-panel{padding:13px}
+.total-row strong{font-size:20px}
+}
+@media print{
+@page{size:A4 portrait;margin:8mm}
+body{background:white;margin:0;padding:0;font-size:11px}
+header,#bookingForm,#paymentSection,#serviceInfo,#showInfo,#seatInfo,#message,.ticket-actions,.page-title{display:none}
+.booking-box{max-width:100%;margin:0;padding:0;box-shadow:none}
+#confirmation{display:block!important;box-shadow:none;border:1px solid #ddd;break-inside:avoid}
+.ticket-header{background:#29204f!important;color:white!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ticket-header p,.ticket-header .brand{color:white!important}
+.status,.reference,.movie-panel,.detail,.seat-panel,.total-row{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ticket-body{padding:15px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2><a href="/index.html">SeatSync.</a></h2>
+    <span>YOUR BOOKING, SIMPLIFIED</span>
+</header>
+
+<div class="booking-box">
+
+<div class="page-title">
+    <h1>Complete Your Booking</h1>
+    <p id="serviceInfo"></p>
+    <div id="showInfo"></div>
+
+    <!-- EVENT QUANTITY -->
+    <div id="eventQuantityBox" style="display:none;margin:15px 0;padding:15px;background:#f0eeff;border-radius:10px;">
+        <label for="ticketQuantity">Number of Tickets</label>
+        <div style="display:flex;align-items:center;gap:15px;margin-top:10px;">
+            <button type="button" id="decreaseTickets">−</button>
+            <strong id="ticketQuantity">1</strong>
+            <button type="button" id="increaseTickets">+</button>
+        </div>
+        <p>Ticket Price: ₹<span id="eventTicketPrice">0</span></p>
+        <h3>Total: ₹<span id="eventTotal">0</span></h3>
+    </div>
+
+    <!-- HOTEL DETAILS -->
+    <div id="hotelBookingBox" style="display:none;margin:15px 0;padding:18px;background:#f0eeff;border-radius:10px;">
+        <h3>Hotel Booking Details</h3>
+
+        <label for="checkInDate">Check-in Date</label>
+        <input type="date" id="checkInDate">
+
+        <label for="checkOutDate">Check-out Date</label>
+        <input type="date" id="checkOutDate">
+
+        <label for="roomQuantity">Number of Rooms</label>
+        <input type="number" id="roomQuantity" min="1" value="1">
+
+        <label for="guestCount">Number of Guests</label>
+        <input type="number" id="guestCount" min="1" value="1">
+
+        <p>Price per night: ₹<strong id="hotelPrice">0.00</strong></p>
+        <p>Total Nights: <strong id="hotelNights">0</strong></p>
+        <h3>Total: ₹<span id="hotelTotal">0.00</span></h3>
+
+        <!-- HOTEL COUPONS -->
+        <div class="coupon-box">
+            <h3>Apply Hotel Coupon 🎁</h3>
+            <p style="color:#6554e8;font-size:13px;">
+                WELCOME10 - Get 10% OFF<br>
+                HOTEL20 - Get 20% OFF
+            </p>
+
+            <label for="couponCode">Coupon Code</label>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <input type="text" id="couponCode" placeholder="Enter coupon code" style="flex:1;min-width:150px;text-transform:uppercase;">
+                <button type="button" id="applyCoupon">Apply</button>
+            </div>
+
+            <p id="couponMessage" style="font-weight:bold;"></p>
+
+            <div class="coupon-summary">
+                Original Amount: ₹<strong id="originalAmount">0.00</strong><br>
+                Discount: <strong style="color:green;">- ₹<span id="discountAmount">0.00</span></strong>
+                <h3>Final Amount: ₹<span id="finalAmount">0.00</span></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPORTS BOOKING DETAILS -->
+    <div id="sportsBookingBox" style="display:none;margin:15px 0;padding:18px;background:#f0eeff;border-radius:10px;">
+        <h3>Sports Booking Details</h3>
+
+        <label for="sportsDate">Booking Date</label>
+        <input type="date" id="sportsDate">
+
+        <label for="sportsStartTime">Start Time</label>
+        <input type="time" id="sportsStartTime">
+
+        <label for="sportsDuration">Duration (Hours)</label>
+        <input type="number" id="sportsDuration" min="1" max="12" value="1">
+
+        <p>Price per hour: ₹<strong id="sportsPrice">0.00</strong></p>
+        <h3>Total: ₹<span id="sportsTotal">0.00</span></h3>
+    </div>
+
+    <p id="seatInfo"></p>
+</div>
+
+<!-- CUSTOMER FORM -->
+<form id="bookingForm">
+    <label for="customerName">Your Name</label>
+    <input type="text" id="customerName" maxlength="100" autocomplete="name" required>
+    <button type="submit" id="bookButton">Proceed to Payment</button>
+</form>
+
+<!-- PAYMENT -->
+<section id="paymentSection" style="display:none;margin-top:25px">
+    <h2>Complete Your Payment</h2>
+    <p>Choose your preferred payment method:</p>
+
+    <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="UPI" checked> UPI
+    </label>
+
+    <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="CARD"> Debit / Credit Card
+    </label>
+
+    <label class="payment-option">
+        <input type="radio" name="paymentMethod" value="COD"> Cash on Delivery
+    </label>
+
+    <div style="background:#f0eeff;padding:15px;border-radius:8px;margin-top:20px">
+        <strong>Total Amount: ₹<span id="paymentAmount">0.00</span></strong>
+    </div>
+
+    <button type="button" id="payButton">Pay Now (Demo)</button>
+    <button type="button" id="cancelPayment" style="background:#777;width:100%">Back</button>
+    <p id="paymentMessage" role="status"></p>
+</section>
+
+<p id="message" role="status" aria-live="polite"></p>
+
+<!-- BOOKING CONFIRMATION TICKET -->
+<section id="confirmation">
+
+    <div class="ticket-header">
+        <div class="brand">SEATSYNC • E-TICKET</div>
+        <h2 id="ticketHeading">Booking Confirmed!</h2>
+        <p>Your next great experience starts here.</p>
+    </div>
+
+    <div class="ticket-body">
+
+        <div class="confirmed-banner">
+            <span id="ticketStatus" class="status pending">PENDING</span>
+        </div>
+
+        <div class="movie-panel">
+            <div id="ticketPosterContainer">
+                <img id="ticketPoster" alt="Movie poster">
+            </div>
+
+            <div class="movie-info">
+                <div class="eyebrow">YOUR MOVIE</div>
+                <div id="ticketMovie">Movie</div>
+                <p id="ticketGenre"></p>
+                <p>Keep this ticket handy for your visit.</p>
+            </div>
+        </div>
+
+        <div class="reference">
+            <div class="reference-label">BOOKING REFERENCE</div>
+            <strong id="ticketReference"></strong>
+            <div id="qrContainer">
+                <img id="ticketQr" alt="Booking reference QR code">
+                <small>QR code contains your booking reference</small>
+            </div>
+        </div>
+
+        <div class="section-title">BOOKING DETAILS</div>
+
+        <div class="details-grid">
+            <div class="detail"><span>BOOKED BY</span><strong id="ticketCustomer"></strong></div>
+            <div class="detail"><span>CINEMA</span><strong id="ticketCinema"></strong></div>
+            <div class="detail"><span>SHOW DATE</span><strong id="ticketDate"></strong></div>
+            <div class="detail"><span>SHOW TIME</span><strong id="ticketTime"></strong></div>
+            <div class="detail"><span>CITY</span><strong id="ticketCity"></strong></div>
+            <div class="detail"><span>PAYMENT METHOD</span><strong id="ticketPayment"></strong></div>
+        </div>
+
+        <div class="seat-panel">
+            <div>
+                <span>YOUR SELECTED SEATS</span><br>
+                <strong id="ticketSeats"></strong>
+            </div>
+            <div style="text-align:right">
+                <span>TICKETS</span><br>
+                <strong id="ticketCount"></strong>
+            </div>
+        </div>
+
+        <div class="section-title">PAYMENT SUMMARY</div>
+
+        <div class="payment-row">
+            <span>Booking reference</span>
+            <strong id="ticketReferenceSmall"></strong>
+        </div>
+
+        <div class="payment-row">
+            <span>Booking status</span>
+            <strong id="ticketStatusText"></strong>
+        </div>
+
+        <!-- COUPON DETAILS -->
+        <div id="ticketCouponDetails" style="display:none">
+            <div class="payment-row">
+                <span>Original Amount</span>
+                <strong id="ticketOriginalAmount"></strong>
+            </div>
+            <div class="payment-row">
+                <span>Coupon Applied</span>
+                <strong id="ticketCouponCode"></strong>
+            </div>
+            <div class="payment-row">
+                <span>Discount</span>
+                <strong id="ticketDiscountAmount" style="color:green"></strong>
+            </div>
+        </div>
+
+        <div class="total-row">
+            <span>
+                TOTAL AMOUNT PAID<br>
+                <small id="paymentDisclaimer">Demo payment only</small>
+            </span>
+            <strong id="ticketAmount"></strong>
+        </div>
+
+        <p class="ticket-note">
+            Please arrive before your show begins and keep your booking reference available.<br>
+            This ticket is generated by SeatSync.
+        </p>
+
+        <div class="ticket-actions">
+            <button type="button" onclick="window.print()">Print Ticket</button>
+            <a href="/history.html" class="action-link secondary">My Bookings</a>
+            <a href="/movies.html" id="exploreLink" class="action-link">Explore Movies</a>
+        </div>
+
+    </div>
+</section>
+
+</div>
+
+<script>
+"use strict";
+
+// URL PARAMETERS
+const params = new URLSearchParams(window.location.search);
+
+const serviceType = (params.get("type") || "").toUpperCase();
+const serviceId = Number(params.get("id"));
+const showIdParam = params.get("showId");
+const showId = showIdParam ? Number(showIdParam) : null;
+const seatsParam = params.get("seats");
+
+const allowedTypes = ["MOVIE", "EVENT", "HOTEL", "SPORTS"];
+
+const message = document.getElementById("message");
+const bookingForm = document.getElementById("bookingForm");
+const nameInput = document.getElementById("customerName");
+const bookButton = document.getElementById("bookButton");
+const paymentSection = document.getElementById("paymentSection");
+const payButton = document.getElementById("payButton");
+const cancelPayment = document.getElementById("cancelPayment");
+const paymentAmount = document.getElementById("paymentAmount");
+const paymentMessage = document.getElementById("paymentMessage");
+
+let customerNameForBooking = "";
+let paymentInProgress = false;
+let currentShow = null;
+let currentEvent = null;
+let currentHotel = null;
+let currentSports = null;
+let ticketQuantity = 1;
+
+// COUPON VARIABLES
+let couponAppliedCode = "";
+let couponDiscount = 0;
+
+const hotelBox = document.getElementById("hotelBookingBox");
+const checkInInput = document.getElementById("checkInDate");
+const checkOutInput = document.getElementById("checkOutDate");
+const roomInput = document.getElementById("roomQuantity");
+const guestInput = document.getElementById("guestCount");
+
+// SPORTS ELEMENTS
+const sportsBox = document.getElementById("sportsBookingBox");
+const sportsDateInput = document.getElementById("sportsDate");
+const sportsTimeInput = document.getElementById("sportsStartTime");
+const sportsDurationInput = document.getElementById("sportsDuration");
+
+const selectedSeats = seatsParam
+    ? seatsParam.split(",").map(seat => seat.trim())
+    : [];
+
+const validSeatPattern = /^[A-F][1-8]$/;
+
+let validLink =
+    allowedTypes.includes(serviceType) &&
+    Number.isInteger(serviceId) &&
+    serviceId > 0;
+
+if (serviceType === "MOVIE") {
+    if (
+        !Number.isInteger(showId) ||
+        showId <= 0 ||
+        !seatsParam ||
+        selectedSeats.length < 1 ||
+        selectedSeats.length > 6 ||
+        selectedSeats.some(seat => !validSeatPattern.test(seat)) ||
+        new Set(selectedSeats).size !== selectedSeats.length
+    ) {
+        validLink = false;
+    }
+}
+
+// COMMON FUNCTIONS
+function setText(id, value) {
+    document.getElementById(id).textContent =
+        value === null || value === undefined || value === ""
+            ? "Not available"
+            : value;
+}
+
+function formatDate(value) {
+    if (!value) return "Not available";
+
+    const parts = value.split("-");
+
+    if (parts.length !== 3) return value;
+
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function formatTime(value) {
+    if (!value) return "Not available";
+
+    const parts = value.split(":");
+
+    if (parts.length < 2) return value;
+
+    let hour = Number(parts[0]);
+    const minute = parts[1];
+    const suffix = hour >= 12 ? "PM" : "AM";
+
+    hour = hour % 12 || 12;
+
+    return `${hour}:${minute} ${suffix}`;
+}
+
+// COUPON APPLICATION
+document.getElementById("applyCoupon").addEventListener("click", function() {
+
+    const code = document.getElementById("couponCode")
+        .value.trim().toUpperCase();
+
+    const couponMessage = document.getElementById("couponMessage");
+
+    if (!code) {
+        couponMessage.style.color = "red";
+        couponMessage.textContent = "Please enter a coupon code.";
+        return;
+    }
+
+    if (code !== "WELCOME10" && code !== "HOTEL20") {
+        couponAppliedCode = "";
+        couponDiscount = 0;
+
+        couponMessage.style.color = "red";
+        couponMessage.textContent = "Invalid coupon code!";
+
+        updateHotelTotal();
+        return;
+    }
+
+    couponAppliedCode = code;
+
+    couponMessage.style.color = "green";
+    couponMessage.textContent = code + " applied successfully!";
+
+    updateHotelTotal();
+});
+
+// MOVIE DETAILS
+async function loadShowDetails() {
+
+    if (serviceType !== "MOVIE" || !validLink) return;
+
+    try {
+        const response = await fetch("/api/movie-shows/movie/" + serviceId);
+
+        if (!response.ok) {
+            throw new Error("Unable to load show details.");
+        }
+
+        const shows = await response.json();
+
+        currentShow = shows.find(show => Number(show.id) === showId);
+
+        if (!currentShow) {
+            throw new Error("Selected show was not found.");
+        }
+
+        document.getElementById("showInfo").textContent =
+            "Cinema: " + (currentShow.cinemaName || "Not available") +
+            " | City: " + (currentShow.city || "Not available") +
+            " | Date: " + (currentShow.showDate || "Not available") +
+            " | Time: " + (currentShow.showTime || "Not available") +
+            " | Ticket price: ₹" + (currentShow.ticketPrice ?? "Not available");
+
+        document.getElementById("serviceInfo").textContent =
+            "Movie: " + (currentShow.movie?.title || "Movie #" + serviceId);
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("showInfo").textContent =
+            "Unable to load show details.";
+
+        validLink = false;
+        bookButton.disabled = true;
+    }
+}
+
+// EVENT DETAILS
+async function loadEventDetails() {
+
+    if (serviceType !== "EVENT" || !validLink) return;
+
+    try {
+        const response = await fetch("/api/events/" + serviceId);
+
+        if (!response.ok) {
+            throw new Error("Unable to load event details.");
+        }
+
+        currentEvent = await response.json();
+
+        if (!currentEvent || !currentEvent.active) {
+            throw new Error("This event is not available.");
+        }
+
+        document.getElementById("serviceInfo").textContent =
+            "Event: " + currentEvent.name;
+
+        document.getElementById("showInfo").textContent =
+            "Category: " + (currentEvent.category || "N/A") +
+            " | Venue: " + (currentEvent.venue || "N/A") +
+            " | City: " + (currentEvent.city || "N/A") +
+            " | Date: " + formatDate(currentEvent.eventDate) +
+            " | Ticket price: ₹" + currentEvent.ticketPrice;
+
+        document.getElementById("eventQuantityBox").style.display = "block";
+
+        document.getElementById("eventTicketPrice").textContent =
+            Number(currentEvent.ticketPrice).toFixed(2);
+
+        updateEventTotal();
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("showInfo").textContent =
+            "Unable to load event details.";
+
+        validLink = false;
+        bookButton.disabled = true;
+    }
+}
+
+// HOTEL DETAILS
+async function loadHotelDetails() {
+
+    if (serviceType !== "HOTEL" || !validLink) return;
+
+    try {
+        const response = await fetch("/api/hotels");
+
+        if (!response.ok) {
+            throw new Error("Unable to load hotels.");
+        }
+
+        const hotels = await response.json();
+
+        currentHotel = hotels.find(hotel => Number(hotel.id) === serviceId);
+
+        if (!currentHotel || currentHotel.active === false) {
+            throw new Error("This hotel is not available.");
+        }
+
+        document.getElementById("serviceInfo").textContent =
+            "Hotel: " + currentHotel.name;
+
+        document.getElementById("showInfo").textContent =
+            "City: " + (currentHotel.city || "N/A") +
+            " | Address: " + (currentHotel.address || "N/A") +
+            " | Available Rooms: " + currentHotel.availableRooms;
+
+        document.getElementById("hotelPrice").textContent =
+            Number(currentHotel.pricePerNight).toFixed(2);
+
+        hotelBox.style.display = "block";
+
+        const now = new Date();
+        const today = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+
+        checkInInput.min = today;
+        checkOutInput.min = today;
+
+        updateHotelTotal();
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("showInfo").textContent =
+            "Unable to load hotel details: " + error.message;
+
+        validLink = false;
+        bookButton.disabled = true;
+    }
+}
+
+// SPORTS DETAILS
+async function loadSportsDetails() {
+
+    if (serviceType !== "SPORTS" || !validLink) return;
+
+    try {
+        const response = await fetch("/api/sports");
+
+        if (!response.ok) {
+            throw new Error("Unable to load sports facilities.");
+        }
+
+        const facilities = await response.json();
+
+        currentSports = facilities.find(
+            facility => Number(facility.id) === serviceId
+        );
+
+        if (!currentSports || !currentSports.active) {
+            throw new Error("This sports facility is not available.");
+        }
+
+        document.getElementById("serviceInfo").textContent =
+            "Sports Facility: " + currentSports.name;
+
+        document.getElementById("showInfo").textContent =
+            "Sport: " + (currentSports.sportType || "N/A") +
+            " | City: " + (currentSports.city || "N/A") +
+            " | Address: " + (currentSports.address || "N/A");
+
+        document.getElementById("sportsPrice").textContent =
+            Number(currentSports.pricePerHour).toFixed(2);
+
+        sportsBox.style.display = "block";
+
+        const now = new Date();
+        const today = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+
+        sportsDateInput.min = today;
+
+        updateSportsTotal();
+
+    } catch (error) {
+        console.error(error);
+
+        document.getElementById("showInfo").textContent =
+            error.message;
+
+        validLink = false;
+        bookButton.disabled = true;
+    }
+}
+
+// HOTEL PRICE AND COUPON CALCULATION
+function updateHotelTotal() {
+
+    if (!currentHotel) return;
+
+    const checkIn = checkInInput.value;
+    const checkOut = checkOutInput.value;
+    const rooms = Number(roomInput.value);
+
+    if (!checkIn || !checkOut) {
+        document.getElementById("hotelNights").textContent = "0";
+        document.getElementById("hotelTotal").textContent = "0.00";
+        document.getElementById("originalAmount").textContent = "0.00";
+        document.getElementById("discountAmount").textContent = "0.00";
+        document.getElementById("finalAmount").textContent = "0.00";
+        return;
+    }
+
+    const nights = Math.round(
+        (new Date(checkOut + "T00:00:00") -
+        new Date(checkIn + "T00:00:00")) / 86400000
+    );
+
+    document.getElementById("hotelNights").textContent =
+        nights > 0 ? nights : "0";
+
+    const total = Number(currentHotel.pricePerNight) * nights * rooms;
+    const validTotal = nights > 0 && rooms > 0 ? total : 0;
+
+    document.getElementById("hotelTotal").textContent =
+        validTotal.toFixed(2);
+
+    let discount = 0;
+
+    if (couponAppliedCode === "WELCOME10") {
+        discount = validTotal * 0.10;
+    } else if (couponAppliedCode === "HOTEL20") {
+        discount = validTotal * 0.20;
+    }
+
+    couponDiscount = discount;
+
+    document.getElementById("originalAmount").textContent =
+        validTotal.toFixed(2);
+
+    document.getElementById("discountAmount").textContent =
+        discount.toFixed(2);
+
+    document.getElementById("finalAmount").textContent =
+        (validTotal - discount).toFixed(2);
+}
+
+checkInInput.addEventListener("change", function() {
+
+    checkOutInput.min = checkInInput.value;
+
+    if (checkOutInput.value && checkOutInput.value <= checkInInput.value) {
+        checkOutInput.value = "";
+    }
+
+    updateHotelTotal();
+});
+
+checkOutInput.addEventListener("change", updateHotelTotal);
+roomInput.addEventListener("input", updateHotelTotal);
+guestInput.addEventListener("input", updateHotelTotal);
+
+// SPORTS PRICE CALCULATION
+function updateSportsTotal() {
+
+    if (!currentSports) return;
+
+    const duration = Number(sportsDurationInput.value);
+    const total = Number(currentSports.pricePerHour) * duration;
+
+    document.getElementById("sportsTotal").textContent =
+        Number.isFinite(total) && duration > 0
+            ? total.toFixed(2)
+            : "0.00";
+}
+
+sportsDurationInput.addEventListener("input", updateSportsTotal);
+
+// EVENT QUANTITY
+function updateEventTotal() {
+
+    document.getElementById("ticketQuantity").textContent = ticketQuantity;
+
+    const total = Number(currentEvent.ticketPrice) * ticketQuantity;
+
+    document.getElementById("eventTotal").textContent =
+        total.toFixed(2);
+}
+
+document.getElementById("increaseTickets").addEventListener("click", () => {
+
+    if (ticketQuantity < 10) {
+        ticketQuantity++;
+        updateEventTotal();
+    }
+});
+
+document.getElementById("decreaseTickets").addEventListener("click", () => {
+
+    if (ticketQuantity > 1) {
+        ticketQuantity--;
+        updateEventTotal();
+    }
+});
+
+// INITIALIZE PAGE
+if (!validLink) {
+
+    message.textContent =
+        "Invalid booking link or this booking type is not implemented yet.";
+
+    message.style.color = "red";
+    bookButton.disabled = true;
+
+} else if (serviceType === "MOVIE") {
+
+    document.getElementById("showInfo").textContent =
+        "Loading cinema details...";
+
+    document.getElementById("seatInfo").textContent =
+        "Selected seats: " + selectedSeats.join(", ");
+
+    loadShowDetails();
+
+} else if (serviceType === "EVENT") {
+
+    document.getElementById("showInfo").textContent =
+        "Loading event details...";
+
+    document.getElementById("seatInfo").style.display = "none";
+
+    loadEventDetails();
+
+} else if (serviceType === "HOTEL") {
+
+    document.getElementById("showInfo").textContent =
+        "Loading hotel details...";
+
+    document.getElementById("seatInfo").style.display = "none";
+
+    loadHotelDetails();
+
+} else if (serviceType === "SPORTS") {
+
+    document.getElementById("showInfo").textContent =
+        "Loading sports facility details...";
+
+    document.getElementById("seatInfo").style.display = "none";
+
+    loadSportsDetails();
+}
+
+// QR CODE
+function showBookingQr(reference) {
+
+    const qr = document.getElementById("ticketQr");
+    const qrContainer = document.getElementById("qrContainer");
+
+    qr.onerror = function() {
+        qrContainer.style.display = "none";
+    };
+
+    qr.onload = function() {
+        qrContainer.style.display = "block";
+    };
+
+    qr.src =
+        "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" +
+        encodeURIComponent(reference);
+}
+
+// BOOKING STATUS
+function applyStatus(statusValue) {
+
+    const statusElement = document.getElementById("ticketStatus");
+    const status = String(statusValue || "PENDING").toUpperCase();
+
+    setText("ticketStatus", status);
+    setText("ticketStatusText", status);
+
+    statusElement.className = "status";
+
+    const allowedStatuses = [
+        "PENDING", "CONFIRMED", "CANCELLED", "EXPIRED"
+    ];
+
+    statusElement.classList.add(
+        allowedStatuses.includes(status) ? status.toLowerCase() : "pending"
+    );
+
+    document.getElementById("ticketHeading").textContent =
+        status === "CONFIRMED" ? "Booking Confirmed!" : "Booking Details";
+}
+
+// FORM SUBMIT
+bookingForm.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    if (!validLink) return;
+
+    if (serviceType === "MOVIE" && !currentShow) {
+        message.textContent = "Please wait for show details to load.";
+        message.style.color = "red";
+        return;
+    }
+
+    if (serviceType === "EVENT" && !currentEvent) {
+        message.textContent = "Please wait for event details to load.";
+        message.style.color = "red";
+        return;
+    }
+
+    if (serviceType === "HOTEL" && !currentHotel) {
+        message.textContent = "Please wait for hotel details to load.";
+        message.style.color = "red";
+        return;
+    }
+
+    if (serviceType === "SPORTS" && !currentSports) {
+        message.textContent = "Please wait for sports facility details to load.";
+        message.style.color = "red";
+        return;
+    }
+
+    const enteredName = nameInput.value.trim();
+
+    if (!enteredName) {
+        message.textContent = "Please enter your name.";
+        message.style.color = "red";
+        nameInput.focus();
+        return;
+    }
+
+    customerNameForBooking = enteredName;
+
+    let total = 0;
+
+    if (serviceType === "MOVIE") {
+
+        total = Number(currentShow.ticketPrice) * selectedSeats.length;
+
+    } else if (serviceType === "EVENT") {
+
+        total = Number(currentEvent.ticketPrice) * ticketQuantity;
+
+    } else if (serviceType === "HOTEL") {
+
+        const checkIn = checkInInput.value;
+        const checkOut = checkOutInput.value;
+        const rooms = Number(roomInput.value);
+        const guests = Number(guestInput.value);
+
+        if (!checkIn || !checkOut || checkOut <= checkIn) {
+            message.textContent =
+                "Please select valid check-in and check-out dates.";
+            message.style.color = "red";
+            return;
+        }
+
+        if (!Number.isInteger(rooms) || rooms < 1 ||
+            !Number.isInteger(guests) || guests < 1) {
+
+            message.textContent =
+                "Enter valid room and guest quantities.";
+
+            message.style.color = "red";
+            return;
+        }
+
+        if (rooms > Number(currentHotel.availableRooms)) {
+            message.textContent = "Not enough rooms available.";
+            message.style.color = "red";
+            return;
+        }
+
+        if (guests < rooms) {
+            message.textContent =
+                "Guest count must be at least the room count.";
+
+            message.style.color = "red";
+            return;
+        }
+
+        const nights = Math.round(
+            (new Date(checkOut + "T00:00:00") -
+            new Date(checkIn + "T00:00:00")) / 86400000
+        );
+
+        total = Number(currentHotel.pricePerNight) * nights * rooms;
+
+        if (couponAppliedCode === "WELCOME10") {
+            couponDiscount = total * 0.10;
+        } else if (couponAppliedCode === "HOTEL20") {
+            couponDiscount = total * 0.20;
+        } else {
+            couponDiscount = 0;
+        }
+
+        total = total - couponDiscount;
+
+    } else if (serviceType === "SPORTS") {
+
+        const date = sportsDateInput.value;
+        const time = sportsTimeInput.value;
+        const duration = Number(sportsDurationInput.value);
+
+        if (!date || !time) {
+            message.textContent =
+                "Please select booking date and start time.";
+            message.style.color = "red";
+            return;
+        }
+
+        if (date < sportsDateInput.min) {
+            message.textContent = "Please select a valid date.";
+            message.style.color = "red";
+            return;
+        }
+
+        if (!Number.isInteger(duration) || duration < 1 || duration > 12) {
+            message.textContent =
+                "Duration must be between 1 and 12 hours.";
+            message.style.color = "red";
+            return;
+        }
+
+        total = Number(currentSports.pricePerHour) * duration;
+    }
+
+    if (!Number.isFinite(total) || total <= 0) {
+        message.textContent = "Invalid booking amount.";
+        message.style.color = "red";
+        return;
+    }
+
+    paymentAmount.textContent = total.toFixed(2);
+    paymentMessage.textContent = "";
+    message.textContent = "";
+
+    bookingForm.style.display = "none";
+    paymentSection.style.display = "block";
+});
+
+// BACK BUTTON
+cancelPayment.addEventListener("click", function() {
+
+    if (paymentInProgress) return;
+
+    nameInput.value = customerNameForBooking;
+
+    paymentSection.style.display = "none";
+    bookingForm.style.display = "block";
+
+    paymentMessage.textContent = "";
+    message.textContent = "";
+});
+
+// PAYMENT
+payButton.addEventListener("click", async function() {
+
+    if (paymentInProgress || !validLink) return;
+
+    if (!customerNameForBooking) {
+        paymentMessage.textContent = "Please enter your name again.";
+        paymentSection.style.display = "none";
+        bookingForm.style.display = "block";
+        nameInput.focus();
+        return;
+    }
+
+    const selectedMethod = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    );
+
+    if (!selectedMethod) {
+        paymentMessage.textContent = "Please choose a payment method.";
+        return;
+    }
+
+    paymentInProgress = true;
+    payButton.disabled = true;
+    cancelPayment.disabled = true;
+
+    paymentMessage.style.color = "#29204f";
+    paymentMessage.textContent = "Processing demo payment...";
+
+    try {
+
+        await new Promise(resolve => setTimeout(resolve, 1200));
+
+        const bookingRequest = {
+
+            customerName: customerNameForBooking,
+            serviceType: serviceType,
+            serviceId: serviceId,
+
+            showId: serviceType === "MOVIE" ? showId : null,
+
+            seats: serviceType === "MOVIE"
+                ? selectedSeats.join(",")
+                : null,
+
+            ticketQuantity: serviceType === "EVENT"
+                ? ticketQuantity
+                : null,
+
+            checkInDate: serviceType === "HOTEL"
+                ? checkInInput.value
+                : null,
+
+            checkOutDate: serviceType === "HOTEL"
+                ? checkOutInput.value
+                : null,
+
+            roomQuantity: serviceType === "HOTEL"
+                ? Number(roomInput.value)
+                : null,
+
+            guestCount: serviceType === "HOTEL"
+                ? Number(guestInput.value)
+                : null,
+
+            couponCode: serviceType === "HOTEL"
+                ? couponAppliedCode
+                : null,
+
+            sportsDate: serviceType === "SPORTS"
+                ? sportsDateInput.value
+                : null,
+
+            sportsStartTime: serviceType === "SPORTS"
+                ? sportsTimeInput.value
+                : null,
+
+            sportsDurationHours: serviceType === "SPORTS"
+                ? Number(sportsDurationInput.value)
+                : null
+        };
+
+        const response = await fetch("/api/bookings", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(bookingRequest)
+        });
+
+        const responseText = await response.text();
+        let data = {};
+
+        try {
+            data = responseText ? JSON.parse(responseText) : {};
+        } catch (error) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || data.error ||
+                "Booking failed (HTTP " + response.status + ")."
+            );
+        }
+
+        if (!data.bookingReference) {
+            throw new Error("No booking reference was returned.");
+        }
+
+        paymentMessage.textContent = "Confirming booking...";
+
+        const confirmResponse = await fetch(
+            "/api/bookings/" +
+            encodeURIComponent(data.bookingReference) +
+            "/confirm-demo",
+            {method: "PUT"}
+        );
+
+        const confirmText = await confirmResponse.text();
+        let confirmedBooking = {};
+
+        try {
+            confirmedBooking = confirmText ? JSON.parse(confirmText) : {};
+        } catch (error) {
+            confirmedBooking = {};
+        }
+
+        if (!confirmResponse.ok) {
+            throw new Error(
+                confirmedBooking.message ||
+                confirmedBooking.error ||
+                "Booking created, but confirmation failed. Reference: " +
+                data.bookingReference
+            );
+        }
+
+        data = confirmedBooking;
+
+        bookingForm.style.display = "none";
+        paymentSection.style.display = "none";
+
+        document.getElementById("serviceInfo").style.display = "none";
+        document.getElementById("showInfo").style.display = "none";
+        document.getElementById("seatInfo").style.display = "none";
+        document.getElementById("eventQuantityBox").style.display = "none";
+        document.getElementById("hotelBookingBox").style.display = "none";
+        document.getElementById("sportsBookingBox").style.display = "none";
+
+        setText("ticketReference", data.bookingReference);
+        setText("ticketReferenceSmall", data.bookingReference);
+        setText("ticketCustomer", data.customerName || customerNameForBooking);
+
+        // MOVIE TICKET
+        if (serviceType === "MOVIE") {
+
+            setText("ticketMovie",
+                currentShow.movie?.title || "Movie #" + serviceId);
+
+            setText("ticketCinema", currentShow.cinemaName);
+            setText("ticketCity", currentShow.city);
+            setText("ticketDate", formatDate(currentShow.showDate));
+            setText("ticketTime", formatTime(currentShow.showTime));
+            setText("ticketSeats", selectedSeats.join(", "));
+            setText("ticketCount", selectedSeats.length);
+            setText("ticketGenre", currentShow.movie?.genre || "");
+
+            const poster = document.getElementById("ticketPoster");
+
+            if (currentShow.movie?.posterUrl) {
+                poster.src = currentShow.movie.posterUrl;
+                document.getElementById("ticketPosterContainer").style.display = "block";
+            } else {
+                document.getElementById("ticketPosterContainer").style.display = "none";
+            }
+
+            document.querySelector(".movie-info .eyebrow").textContent =
+                "YOUR MOVIE";
+
+            document.querySelectorAll(".details-grid .detail span")[1].textContent =
+                "CINEMA";
+
+            document.querySelectorAll(".details-grid .detail span")[2].textContent =
+                "SHOW DATE";
+
+            document.querySelectorAll(".details-grid .detail span")[3].textContent =
+                "SHOW TIME";
+
+            document.querySelector(".seat-panel span").textContent =
+                "YOUR SELECTED SEATS";
+
+        // EVENT TICKET
+        } else if (serviceType === "EVENT") {
+
+            setText("ticketMovie", currentEvent.name);
+            setText("ticketGenre", currentEvent.category);
+            setText("ticketCinema", currentEvent.venue);
+            setText("ticketCity", currentEvent.city);
+            setText("ticketDate", formatDate(currentEvent.eventDate));
+            setText("ticketTime", "As announced by event organizer");
+            setText("ticketSeats", "General Admission");
+
+            const quantity = data.ticketQuantity || ticketQuantity;
+            setText("ticketCount", quantity);
+
+            document.getElementById("ticketPosterContainer").style.display = "none";
+
+            document.querySelector(".movie-info .eyebrow").textContent =
+                "YOUR EVENT";
+
+            document.querySelectorAll(".details-grid .detail span")[1].textContent =
+                "EVENT VENUE";
+
+            document.querySelectorAll(".details-grid .detail span")[2].textContent =
+                "EVENT DATE";
+
+            document.querySelectorAll(".details-grid .detail span")[3].textContent =
+                "EVENT TIME";
+
+            document.querySelector(".seat-panel span").textContent =
+                "TICKET TYPE";
+
+        // HOTEL TICKET
+        } else if (serviceType === "HOTEL") {
+
+            setText("ticketMovie", currentHotel.name);
+
+            setText("ticketGenre",
+                currentHotel.description || "Hotel Reservation");
+
+            setText("ticketCinema", currentHotel.address);
+            setText("ticketCity", currentHotel.city);
+
+            setText("ticketDate",
+                formatDate(data.checkInDate || checkInInput.value) +
+                " - " +
+                formatDate(data.checkOutDate || checkOutInput.value)
+            );
+
+            setText("ticketTime", "Hotel Stay");
+
+            setText("ticketSeats",
+                (data.roomQuantity || roomInput.value) + " Room(s)");
+
+            setText("ticketCount",
+                (data.guestCount || guestInput.value) + " Guest(s)");
+
+            document.getElementById("ticketPosterContainer").style.display = "none";
+
+            document.querySelector(".movie-info .eyebrow").textContent =
+                "YOUR HOTEL";
+
+            document.querySelectorAll(".details-grid .detail span")[1].textContent =
+                "HOTEL ADDRESS";
+
+            document.querySelectorAll(".details-grid .detail span")[2].textContent =
+                "CHECK-IN / CHECK-OUT";
+
+            document.querySelectorAll(".details-grid .detail span")[3].textContent =
+                "STAY";
+
+            document.querySelector(".seat-panel span").textContent =
+                "ROOMS BOOKED";
+
+            // HOTEL COUPON DETAILS
+            const couponDetails = document.getElementById("ticketCouponDetails");
+
+            const original = Number(data.originalAmount || 0);
+            const discount = Number(data.discountAmount || 0);
+
+            if (data.couponCode && discount > 0) {
+
+                couponDetails.style.display = "block";
+
+                setText("ticketOriginalAmount",
+                    "₹" + original.toFixed(2));
+
+                setText("ticketCouponCode", data.couponCode);
+
+                setText("ticketDiscountAmount",
+                    "- ₹" + discount.toFixed(2));
+
+            } else {
+                couponDetails.style.display = "none";
+            }
+
+        // SPORTS TICKET
+        } else if (serviceType === "SPORTS") {
+
+            setText("ticketMovie", currentSports.name);
+            setText("ticketGenre", currentSports.sportType);
+            setText("ticketCinema", currentSports.address);
+            setText("ticketCity", currentSports.city);
+
+            setText("ticketDate",
+                formatDate(data.sportsDate || sportsDateInput.value));
+
+            setText("ticketTime",
+                formatTime(data.sportsStartTime || sportsTimeInput.value));
+
+            setText("ticketSeats", currentSports.sportType);
+
+            setText("ticketCount",
+                (data.sportsDurationHours || sportsDurationInput.value) + " Hour(s)");
+
+            document.getElementById("ticketPosterContainer").style.display = "none";
+
+            document.querySelector(".movie-info .eyebrow").textContent =
+                "YOUR SPORTS BOOKING";
+
+            document.querySelectorAll(".details-grid .detail span")[1].textContent =
+                "FACILITY ADDRESS";
+
+            document.querySelectorAll(".details-grid .detail span")[2].textContent =
+                "BOOKING DATE";
+
+            document.querySelectorAll(".details-grid .detail span")[3].textContent =
+                "START TIME";
+
+            document.querySelector(".seat-panel span").textContent =
+                "SPORTS TYPE";
+
+            document.querySelector(".seat-panel div:last-child span").textContent =
+                "DURATION";
+        }
+
+        setText("ticketPayment", selectedMethod.value);
+
+        setText("ticketAmount",
+            data.totalAmount != null
+                ? "₹" + Number(data.totalAmount).toFixed(2)
+                : "Not available"
+        );
+
+        document.getElementById("paymentDisclaimer").textContent =
+            "Demo payment only • No real money charged";
+
+        applyStatus(data.status);
+
+        if (data.bookingReference) {
+            showBookingQr(data.bookingReference);
+        }
+
+        document.getElementById("confirmation").style.display = "block";
+
+        if (String(data.status).toUpperCase() === "CONFIRMED") {
+
+            message.style.color = "green";
+
+            message.textContent =
+                "Demo booking confirmed successfully. No real money was charged.";
+
+        } else {
+
+            message.style.color = "#a16207";
+
+            message.textContent =
+                "Booking created. Current status: " +
+                (data.status || "PENDING") +
+                ". No real money was charged.";
+        }
+
+        const exploreLink = document.getElementById("exploreLink");
+
+        if (serviceType === "EVENT") {
+
+            exploreLink.href = "/events.html";
+            exploreLink.textContent = "Explore Events";
+
+        } else if (serviceType === "HOTEL") {
+
+            exploreLink.href = "/hotels.html";
+            exploreLink.textContent = "Explore Hotels";
+
+        } else if (serviceType === "SPORTS") {
+
+            exploreLink.href = "/sports.html";
+            exploreLink.textContent = "Explore Sports";
+
+        } else {
+
+            exploreLink.href = "/movies.html";
+            exploreLink.textContent = "Explore Movies";
+        }
+
+    } catch (error) {
+
+        console.error("Booking error:", error);
+
+        paymentMessage.style.color = "red";
+        paymentMessage.textContent = error.message;
+
+    } finally {
+
+        paymentInProgress = false;
+        payButton.disabled = false;
+        cancelPayment.disabled = false;
+    }
+
+});
+</script>
+
+</body>
+</html>

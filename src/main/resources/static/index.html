@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync | Book Everything</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 25px;
+        }
+
+        body {
+            background: #f5f7ff;
+            color: #172033;
+        }
+
+        header {
+            background: #fff;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #00000010;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #5546e8;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 22px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            color: #5546e8;
+        }
+
+        nav .login,
+        nav .dashboard-btn {
+            background: #5546e8;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 8px;
+        }
+
+        .hero {
+            margin: 30px auto;
+            width: 90%;
+            padding: 65px 7%;
+            border-radius: 22px;
+            background: linear-gradient(120deg, #5546e8, #8879ff);
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 43px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .hero button {
+            margin-top: 25px;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #5546e8;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .hero button:hover {
+            background: #f0edff;
+        }
+
+        .section {
+            width: 90%;
+            margin: 45px auto;
+            scroll-margin-top: 25px;
+        }
+
+        .section h2 {
+            font-size: 27px;
+            margin-bottom: 10px;
+        }
+
+        .section > p {
+            color: #687086;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            padding: 28px 20px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px #00000008;
+            border: 1px solid #eee;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px #5546e820;
+        }
+
+        .card .symbol {
+            font-size: 35px;
+            margin-bottom: 17px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #687086;
+            margin-bottom: 18px;
+        }
+
+        .card a,
+        .result-card a {
+            color: #5546e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .card a:hover,
+        .result-card a:hover {
+            text-decoration: underline;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .result-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .result-card p {
+            color: #687086;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .result-card a {
+            display: inline-block;
+        }
+
+        .journey {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            border: 1px solid #eee;
+        }
+
+        .journey a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 12px 20px;
+            background: #5546e8;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 28px;
+            text-align: center;
+            background: #172033;
+            color: white;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 900px) {
+            .categories,
+            .results {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            nav {
+                justify-content: center;
+                gap: 16px;
+            }
+
+            .hero {
+                padding: 40px 25px;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .categories,
+            .results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SeatSync.</div>
+
+    <nav>
+        <a href="#categories">Explore</a>
+        <a href="#discover">Discover</a>
+        <a href="/history.html">My Bookings</a>
+        <a href="/login.html" class="login" id="loginBtn">Login</a>
+        <a href="/dashboard.html"
+           class="dashboard-btn"
+           id="dashboardBtn"
+           style="display:none;">My Dashboard</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Everything You Love.<br>One Booking Platform.</h1>
+
+    <p>
+        Book movie tickets, discover exciting events, reserve hotels
+        and find sports facilities — all in one place.
+    </p>
+
+    <button onclick="scrollToSection('categories')">
+        Explore Services
+    </button>
+</section>
+
+<section class="section" id="categories">
+    <h2>Explore Our Services</h2>
+    <p>Choose what you want to book today.</p>
+
+    <div class="categories">
+
+        <div class="card">
+            <div class="symbol">🎬</div>
+            <h3>Movies</h3>
+            <p>Discover movies and plan your next cinema experience.</p>
+            <a href="/movies.html">Explore Movies →</a>
+        </div>
+
+        <div class="card">
+            <div class="symbol">🎟️</div>
+            <h3>Events</h3>
+            <p>Find concerts, live shows and exciting events.</p>
+            <a href="/events.html">Explore Events →</a>
+        </div>
+
+        <div class="card">
+            <div class="symbol">🏨</div>
+            <h3>Hotels & Stays</h3>
+            <p>Find comfortable stays for your next trip.</p>
+            <a href="/hotels.html">Explore Hotels →</a>
+        </div>
+
+        <div class="card">
+            <div class="symbol">🏸</div>
+            <h3>Sports & Turf</h3>
+            <p>Discover sports facilities and book playing time.</p>
+            <a href="/sports.html">Explore Sports →</a>
+        </div>
+
+    </div>
+</section>
+
+<section class="section" id="discover">
+    <h2>Discover SeatSync</h2>
+    <p>Your next experience is just a few clicks away.</p>
+
+    <div class="results">
+
+        <div class="result-card">
+            <h3>🎬 Movies</h3>
+            <p id="movieCount">Loading movies...</p>
+            <a href="/movies.html">View Movies →</a>
+        </div>
+
+        <div class="result-card">
+            <h3>🎟️ Events</h3>
+            <p id="eventCount">Loading events...</p>
+            <a href="/events.html">View Events →</a>
+        </div>
+
+        <div class="result-card">
+            <h3>🏨 Hotels</h3>
+            <p id="hotelCount">Loading hotels...</p>
+            <a href="/hotels.html">View Hotels →</a>
+        </div>
+
+        <div class="result-card">
+            <h3>🏸 Sports Facilities</h3>
+            <p id="sportsCount">Loading sports facilities...</p>
+            <a href="/sports.html">View Sports →</a>
+        </div>
+
+    </div>
+</section>
+
+<section class="section" id="bookings">
+    <h2>Your Booking Journey</h2>
+    <p>
+        Keep track of your reservations and check your booking status
+        whenever you need.
+    </p>
+
+    <div class="journey">
+        <h3>Manage Your Bookings</h3>
+        <p style="margin:12px 0;color:#687086;">
+            View booking references, selected seats, amounts and status.
+        </p>
+        <a href="/history.html">View My Bookings →</a>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 SeatSync. All rights reserved.</p>
+    <p>Movies · Events · Hotels · Sports</p>
+</footer>
+
+<script>
+    function scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+
+        if (section) {
+            section.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }
+
+    async function loadCount(url, elementId, label) {
+        const element = document.getElementById(elementId);
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("API request failed");
+            }
+
+            const data = await response.json();
+
+            if (!Array.isArray(data)) {
+                throw new Error("Unexpected API response");
+            }
+
+            const availableItems = data.filter(
+                item => item.active !== false
+            );
+
+            element.textContent =
+                availableItems.length + " " + label + " available";
+
+        } catch (error) {
+            element.textContent =
+                "Unable to load " + label.toLowerCase();
+        }
+    }
+
+    loadCount("/api/movies", "movieCount", "movies");
+    loadCount("/api/events", "eventCount", "events");
+    loadCount("/api/hotels", "hotelCount", "hotels");
+    loadCount("/api/sports", "sportsCount", "sports facilities");
+
+    const name = sessionStorage.getItem("seatsyncName");
+
+    if (name) {
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("dashboardBtn").style.display = "inline-block";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1228 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync | Admin Movie Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20243a;
+}
+
+.sidebar {
+    width: 245px;
+    background: #17152d;
+    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.logo span {
+    color: #a99bff;
+}
+
+.sidebar small {
+    color: #aaa5c8;
+    margin-bottom: 35px;
+}
+
+.nav-title {
+    font-size: 11px;
+    color: #8984a5;
+    margin: 18px 10px 12px;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: block;
+    padding: 13px;
+    margin-bottom: 7px;
+    color: #d3d0e3;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #6555dc;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.logout {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: white;
+    border: 1px solid #514b70;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background: #df465f;
+}
+
+.main {
+    margin-left: 245px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    gap: 15px;
+}
+
+.header h1 {
+    font-size: 27px;
+}
+
+.header p {
+    color: #888;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.admin-profile {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #eeeef5;
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.stat-card p {
+    color: #888;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    font-size: 30px;
+    margin-top: 12px;
+}
+
+.panel {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eeeef5;
+    padding: 24px;
+    margin-bottom: 25px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    font-size: 19px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.add-btn {
+    background: #6555dc;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-btn:hover {
+    background: #4c3bc5;
+}
+
+.search {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f7f6fc;
+    padding: 14px;
+    text-align: left;
+    color: #777;
+    font-size: 12px;
+}
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.poster {
+    width: 48px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #eee;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-active {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.status-inactive {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.action-btn {
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    margin: 2px;
+    font-size: 12px;
+}
+
+.edit-btn {
+    color: #6555dc;
+    background: #eeeaff;
+}
+
+.deactivate-btn {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.activate-btn {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 35px;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+/* FORM MODAL */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    background: white;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.field input,
+.field textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+/* POSTER PREVIEW */
+
+.poster-preview-box {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f7f6fc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 145px;
+}
+
+.poster-preview {
+    width: 90px;
+    height: 125px;
+    object-fit: cover;
+    border-radius: 7px;
+    display: none;
+    background: #eee;
+}
+
+.poster-preview-placeholder {
+    width: 90px;
+    height: 125px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8e5f5;
+    border-radius: 7px;
+    font-size: 30px;
+}
+
+.help-text {
+    font-size: 12px;
+    color: #777;
+    margin-top: 7px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.cancel-btn {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #eee;
+}
+
+@media(max-width: 850px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        margin-left: 190px;
+        padding: 20px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-bottom {
+        margin-top: 20px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">Seat<span>Sync.</span></div>
+    <small>ADMINISTRATION PANEL</small>
+
+    <div class="nav-title">MAIN MENU</div>
+
+    <a href="/admin.html" class="nav-link">◈ Overview</a>
+
+    <div class="nav-title">MANAGEMENT</div>
+
+    <a href="/admin-movies.html" class="nav-link active">🎬 Movies</a>
+    <a href="/admin-events.html" class="nav-link">🎟 Events</a>
+    <a href="/admin.html#management" class="nav-link">🏨 Hotels</a>
+    <a href="/admin.html#management" class="nav-link">🏆 Sports</a>
+    <a href="/admin.html#bookings" class="nav-link">📋 Bookings</a>
+    <a href="/admin.html#users" class="nav-link">👥 Users</a>
+
+    <div class="sidebar-bottom">
+        <button class="logout" onclick="logout()">↪ Logout</button>
+    </div>
+
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>Movie Management 🎬</h1>
+            <p>Manage all movies available on SeatSync.</p>
+        </div>
+
+        <div class="admin-profile" id="adminName">
+            Administrator
+        </div>
+    </div>
+
+    <!-- STATISTICS -->
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <p>Total Movies</p>
+            <h2 id="totalMovies">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Active Movies</p>
+            <h2 id="activeMovies">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Inactive Movies</p>
+            <h2 id="inactiveMovies">0</h2>
+        </div>
+
+    </section>
+
+    <!-- MOVIE TABLE -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h2>All Movies</h2>
+
+            <button class="add-btn" onclick="openAddForm()">
+                + Add New Movie
+            </button>
+        </div>
+
+        <div class="panel-header">
+            <input
+                type="text"
+                id="searchInput"
+                class="search"
+                placeholder="Search movie by title..."
+                oninput="searchMovies()">
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Poster</th>
+                        <th>Movie</th>
+                        <th>Genre</th>
+                        <th>Language</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="movieTable">
+                    <tr>
+                        <td colspan="7" class="empty">
+                            Loading movies...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <p id="message"></p>
+
+    </section>
+
+</main>
+
+<!-- ADD / EDIT FORM -->
+
+<div class="modal" id="movieModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2 id="modalTitle">Add New Movie</h2>
+
+            <button class="close-btn" onclick="closeForm()">×</button>
+        </div>
+
+        <form id="movieForm">
+
+            <input type="hidden" id="movieId">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Movie Title *</label>
+                    <input id="title" required>
+                </div>
+
+                <div class="field">
+                    <label>Genre</label>
+                    <input id="genre">
+                </div>
+
+                <div class="field">
+                    <label>Language</label>
+                    <input id="language">
+                </div>
+
+                <div class="field">
+                    <label>Duration (Minutes) *</label>
+                    <input id="durationMinutes"
+                           type="number"
+                           min="1"
+                           required>
+                </div>
+
+                <div class="field">
+                    <label>Ticket Price *</label>
+                    <input id="ticketPrice"
+                           type="number"
+                           min="0.01"
+                           step="0.01"
+                           required>
+                </div>
+
+                <!-- POSTER URL AND PREVIEW -->
+
+                <div class="field full">
+
+                    <label>Movie Poster URL</label>
+
+                    <input
+                        id="posterUrl"
+                        type="url"
+                        placeholder="Paste direct poster image URL"
+                        oninput="previewPoster()">
+
+                    <p class="help-text">
+                        Paste a direct movie poster image URL.
+                    </p>
+
+                    <div class="poster-preview-box">
+
+                        <div class="poster-preview-placeholder"
+                             id="posterPlaceholder">
+                            🎬
+                        </div>
+
+                        <img
+                            id="posterPreview"
+                            class="poster-preview"
+                            alt="Movie poster preview">
+
+                        <span>Poster Preview</span>
+
+                    </div>
+
+                </div>
+
+                <div class="field full">
+                    <label>Description</label>
+                    <textarea id="description"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>Cinema Name</label>
+                    <input id="cinemaName">
+                </div>
+
+                <div class="field">
+                    <label>City</label>
+                    <input id="city">
+                </div>
+
+                <div class="field full">
+                    <label>Theater Address</label>
+                    <input id="theaterAddress">
+                </div>
+
+                <div class="field">
+                    <label>Show Date</label>
+                    <input id="showDate" type="date">
+                </div>
+
+                <div class="field">
+                    <label>Show Time</label>
+                    <input id="showTime" type="time">
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeForm()">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="add-btn"
+                    id="saveBtn">
+                    Add Movie
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+// ADMIN SESSION
+
+const userId = sessionStorage.getItem("seatsyncUserId");
+const role = sessionStorage.getItem("seatsyncRole");
+
+if (!userId || role !== "ADMIN") {
+
+    alert("Please login with your admin account.");
+    window.location.href = "/login.html";
+
+}
+
+document.getElementById("adminName").textContent =
+    sessionStorage.getItem("seatsyncName") || "Administrator";
+
+let allMovies = [];
+
+
+// LOAD MOVIES
+
+async function loadMovies() {
+
+    const table = document.getElementById("movieTable");
+
+    try {
+
+        const response = await fetch("/api/movies/admin/all", {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+
+            throw new Error(
+                response.status === 403
+                    ? "Admin access denied. Please login again."
+                    : "Unable to load movies."
+            );
+
+        }
+
+        allMovies = await response.json();
+
+        updateStats();
+        displayMovies(allMovies);
+
+        document.getElementById("message").textContent =
+            "Movies loaded successfully.";
+
+    } catch (error) {
+
+        table.innerHTML =
+            '<tr><td colspan="7" class="empty">Unable to load movies.</td></tr>';
+
+        document.getElementById("message").textContent =
+            error.message;
+
+    }
+
+}
+
+
+// UPDATE STATISTICS
+
+function updateStats() {
+
+    const active = allMovies.filter(movie => movie.active);
+    const inactive = allMovies.filter(movie => !movie.active);
+
+    document.getElementById("totalMovies").textContent =
+        allMovies.length;
+
+    document.getElementById("activeMovies").textContent =
+        active.length;
+
+    document.getElementById("inactiveMovies").textContent =
+        inactive.length;
+
+}
+
+
+// SAFE TEXT
+
+function escapeHTML(value) {
+
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+
+}
+
+
+// DISPLAY MOVIES
+
+function displayMovies(movies) {
+
+    const table = document.getElementById("movieTable");
+
+    if (!movies.length) {
+
+        table.innerHTML =
+            '<tr><td colspan="7" class="empty">No movies found.</td></tr>';
+
+        return;
+
+    }
+
+    table.innerHTML = movies.map(movie => {
+
+        const status = movie.active
+            ? '<span class="status status-active">Active</span>'
+            : '<span class="status status-inactive">Inactive</span>';
+
+        const action = movie.active
+
+            ? `<button class="action-btn deactivate-btn"
+                onclick="changeStatus(${movie.id}, false)">
+                Deactivate
+              </button>`
+
+            : `<button class="action-btn activate-btn"
+                onclick="changeStatus(${movie.id}, true)">
+                Activate
+              </button>`;
+
+        const poster = movie.posterUrl
+
+            ? `<img class="poster"
+                src="${escapeHTML(movie.posterUrl)}"
+                alt="${escapeHTML(movie.title)} poster"
+                onerror="this.onerror=null;this.outerHTML='🎬'">`
+
+            : "🎬";
+
+        return `
+            <tr>
+
+                <td>${poster}</td>
+
+                <td>
+                    <strong>${escapeHTML(movie.title)}</strong>
+                </td>
+
+                <td>${escapeHTML(movie.genre || "-")}</td>
+
+                <td>${escapeHTML(movie.language || "-")}</td>
+
+                <td>₹${Number(movie.ticketPrice || 0).toFixed(2)}</td>
+
+                <td>${status}</td>
+
+                <td>
+
+                    <button class="action-btn edit-btn"
+                        onclick="editMovie(${movie.id})">
+                        Edit
+                    </button>
+
+                    ${action}
+
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+}
+
+
+// SEARCH
+
+async function searchMovies() {
+
+    const keyword = document.getElementById("searchInput")
+        .value.trim();
+
+    if (!keyword) {
+
+        displayMovies(allMovies);
+        return;
+
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/movies/admin/search?keyword=" +
+            encodeURIComponent(keyword),
+            {
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Search failed.");
+        }
+
+        const results = await response.json();
+
+        displayMovies(results);
+
+    } catch (error) {
+
+        document.getElementById("message").textContent =
+            error.message;
+
+    }
+
+}
+
+
+// POSTER PREVIEW
+
+function previewPoster() {
+
+    const url = document.getElementById("posterUrl").value.trim();
+
+    const preview = document.getElementById("posterPreview");
+    const placeholder = document.getElementById("posterPlaceholder");
+
+    preview.onload = function() {
+
+        preview.style.display = "block";
+        placeholder.style.display = "none";
+
+    };
+
+    preview.onerror = function() {
+
+        preview.style.display = "none";
+        placeholder.style.display = "flex";
+
+    };
+
+    if (!url) {
+
+        preview.removeAttribute("src");
+
+        preview.style.display = "none";
+        placeholder.style.display = "flex";
+
+        return;
+
+    }
+
+    preview.src = url;
+
+}
+
+
+// OPEN ADD FORM
+
+function openAddForm() {
+
+    document.getElementById("movieForm").reset();
+
+    document.getElementById("movieId").value = "";
+
+    document.getElementById("modalTitle").textContent =
+        "Add New Movie";
+
+    document.getElementById("saveBtn").textContent =
+        "Add Movie";
+
+    previewPoster();
+
+    document.getElementById("movieModal").classList.add("show");
+
+}
+
+
+// EDIT MOVIE
+
+function editMovie(id) {
+
+    const movie = allMovies.find(item => item.id === id);
+
+    if (!movie) return;
+
+    document.getElementById("movieId").value = movie.id;
+
+    document.getElementById("title").value =
+        movie.title || "";
+
+    document.getElementById("genre").value =
+        movie.genre || "";
+
+    document.getElementById("language").value =
+        movie.language || "";
+
+    document.getElementById("durationMinutes").value =
+        movie.durationMinutes || "";
+
+    document.getElementById("ticketPrice").value =
+        movie.ticketPrice || "";
+
+    document.getElementById("posterUrl").value =
+        movie.posterUrl || "";
+
+    document.getElementById("description").value =
+        movie.description || "";
+
+    document.getElementById("cinemaName").value =
+        movie.cinemaName || "";
+
+    document.getElementById("city").value =
+        movie.city || "";
+
+    document.getElementById("theaterAddress").value =
+        movie.theaterAddress || "";
+
+    document.getElementById("showDate").value =
+        movie.showDate || "";
+
+    document.getElementById("showTime").value =
+        movie.showTime || "";
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Movie";
+
+    document.getElementById("saveBtn").textContent =
+        "Update Movie";
+
+    previewPoster();
+
+    document.getElementById("movieModal").classList.add("show");
+
+}
+
+
+// CLOSE FORM
+
+function closeForm() {
+
+    document.getElementById("movieModal").classList.remove("show");
+
+}
+
+
+// ADD OR UPDATE
+
+document.getElementById("movieForm").addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const id = document.getElementById("movieId").value;
+
+        const movie = {
+
+            title: document.getElementById("title").value.trim(),
+
+            genre: document.getElementById("genre").value.trim(),
+
+            language: document.getElementById("language").value.trim(),
+
+            durationMinutes: Number(
+                document.getElementById("durationMinutes").value
+            ),
+
+            ticketPrice: Number(
+                document.getElementById("ticketPrice").value
+            ),
+
+            posterUrl: document.getElementById("posterUrl").value.trim(),
+
+            description:
+                document.getElementById("description").value.trim(),
+
+            cinemaName:
+                document.getElementById("cinemaName").value.trim(),
+
+            city: document.getElementById("city").value.trim(),
+
+            theaterAddress:
+                document.getElementById("theaterAddress").value.trim(),
+
+            showDate:
+                document.getElementById("showDate").value || null,
+
+            showTime:
+                document.getElementById("showTime").value || null
+
+        };
+
+        const saveBtn = document.getElementById("saveBtn");
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch(
+                id ? "/api/movies/" + id : "/api/movies",
+                {
+                    method: id ? "PUT" : "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    credentials: "same-origin",
+
+                    body: JSON.stringify(movie)
+                }
+            );
+
+            if (!response.ok) {
+
+                const error = await response.text();
+
+                throw new Error(error || "Unable to save movie.");
+
+            }
+
+            alert(
+                id
+                    ? "Movie updated successfully!"
+                    : "Movie added successfully!"
+            );
+
+            closeForm();
+
+            document.getElementById("searchInput").value = "";
+
+            await loadMovies();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        } finally {
+
+            saveBtn.disabled = false;
+
+            saveBtn.textContent = id
+                ? "Update Movie"
+                : "Add Movie";
+
+        }
+
+    }
+);
+
+
+// ACTIVATE / DEACTIVATE
+
+async function changeStatus(id, activate) {
+
+    const action = activate ? "activate" : "deactivate";
+
+    if (!confirm("Are you sure you want to " + action + " this movie?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            activate
+                ? `/api/movies/${id}/activate`
+                : `/api/movies/${id}`,
+            {
+                method: activate ? "PUT" : "DELETE",
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to " + action + " movie.");
+        }
+
+        alert("Movie " + action + "d successfully!");
+
+        await loadMovies();
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+
+}
+
+
+// LOGOUT
+
+async function logout() {
+
+    try {
+
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    sessionStorage.clear();
+
+    window.location.href = "/login.html";
+
+}
+
+
+// START
+
+loadMovies();
+
+</script>
+
+</body>
+</html>

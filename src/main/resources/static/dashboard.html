@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync | Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #f5f7ff;
+            color: #172033;
+        }
+
+        header {
+            background: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 2px 12px #00000010;
+        }
+
+        .logo {
+            color: #5546e8;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        button, .header-link {
+            background: #5546e8;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .header-link:hover, button:hover {
+            background: #4032c4;
+        }
+
+        .welcome {
+            margin: 35px auto;
+            width: 90%;
+            padding: 40px;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #5546e8, #9185ff);
+            color: white;
+        }
+
+        .welcome h1 {
+            margin-bottom: 12px;
+            font-size: 32px;
+        }
+
+        .welcome p {
+            line-height: 1.6;
+        }
+
+        .section {
+            width: 90%;
+            margin: 35px auto;
+        }
+
+        .section h2 {
+            margin-bottom: 10px;
+        }
+
+        .section-description {
+            color: #687086;
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #e8e8f0;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px #5546e815;
+        }
+
+        .card .icon {
+            font-size: 34px;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #687086;
+            margin-top: 10px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .count {
+            font-weight: bold;
+            color: #5546e8 !important;
+        }
+
+        .card a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #5546e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .card a:hover {
+            text-decoration: underline;
+        }
+
+        .booking-panel {
+            background: white;
+            border: 1px solid #e8e8f0;
+            border-radius: 15px;
+            padding: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .booking-panel p {
+            color: #687086;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        #status {
+            margin-top: 20px;
+            color: #687086;
+        }
+
+        footer {
+            background: #172033;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 950px) {
+            .cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px;
+            }
+
+            .welcome {
+                padding: 25px;
+            }
+
+            .welcome h1 {
+                font-size: 27px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SeatSync.</div>
+
+    <div class="header-actions">
+        <a href="/index.html" class="header-link">Home</a>
+
+        <a href="/history.html" class="header-link">My Bookings</a>
+
+        <!-- NEW: My Profile button -->
+        <a href="/profile.html" class="header-link">My Profile</a>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<section class="welcome">
+    <h1 id="welcomeTitle">Welcome to SeatSync!</h1>
+    <p>
+        Discover experiences, plan your next outing,
+        and manage your bookings.
+    </p>
+</section>
+
+<section class="section" id="services">
+    <h2>Explore Services</h2>
+
+    <p class="section-description">
+        Choose a service and start planning your next experience.
+    </p>
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="icon">🎬</div>
+            <h3>Movies</h3>
+            <p>Discover movies for your next cinema experience.</p>
+            <p class="count" id="movieCount">Loading movies...</p>
+            <a href="/movies.html">Explore Movies →</a>
+        </div>
+
+        <div class="card">
+            <div class="icon">🎟️</div>
+            <h3>Events</h3>
+            <p>Explore concerts, shows, and live events.</p>
+            <p class="count" id="eventCount">Loading events...</p>
+            <a href="/events.html">Explore Events →</a>
+        </div>
+
+        <div class="card">
+            <div class="icon">🏨</div>
+            <h3>Hotels & Stays</h3>
+            <p>Find a comfortable place for your next trip.</p>
+            <p class="count" id="hotelCount">Loading hotels...</p>
+            <a href="/hotels.html">Explore Hotels →</a>
+        </div>
+
+        <div class="card">
+            <div class="icon">🏸</div>
+            <h3>Sports & Turf</h3>
+            <p>Find sports facilities and available playing slots.</p>
+            <p class="count" id="sportsCount">Loading sports...</p>
+            <a href="/sports.html">Explore Sports →</a>
+        </div>
+
+    </div>
+
+    <p id="status"></p>
+</section>
+
+<section class="section">
+    <h2>Manage Your Bookings</h2>
+
+    <p class="section-description">
+        Keep track of your reservations, selected seats, amounts,
+        and booking status.
+    </p>
+
+    <div class="booking-panel">
+        <div>
+            <h3>My Booking History</h3>
+            <p>View your bookings and cancel eligible reservations.</p>
+        </div>
+
+        <a href="/history.html" class="header-link">
+            View My Bookings →
+        </a>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 SeatSync. All rights reserved.</p>
+    <p style="margin-top: 10px;">Movies · Events · Hotels · Sports</p>
+</footer>
+
+<script>
+    // Display logged-in user's name
+    const name = sessionStorage.getItem("seatsyncName");
+
+    if (name) {
+        document.getElementById("welcomeTitle").textContent =
+            "Welcome, " + name + "!";
+    }
+
+    // Load service counts
+    async function loadCount(url, elementId, label) {
+        const element = document.getElementById(elementId);
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("Request failed");
+            }
+
+            const data = await response.json();
+
+            if (!Array.isArray(data)) {
+                throw new Error("Invalid response");
+            }
+
+            const available = data.filter(
+                item => item.active !== false
+            );
+
+            element.textContent =
+                available.length + " " + label + " available";
+
+        } catch (error) {
+            element.textContent = "Unable to load " + label;
+        }
+    }
+
+    loadCount("/api/movies", "movieCount", "movies");
+    loadCount("/api/events", "eventCount", "events");
+    loadCount("/api/hotels", "hotelCount", "hotels");
+    loadCount("/api/sports", "sportsCount", "sports facilities");
+
+    // Logout
+    function logout() {
+        sessionStorage.removeItem("seatsyncUserId");
+        sessionStorage.removeItem("seatsyncName");
+        sessionStorage.removeItem("seatsyncEmail");
+
+        window.location.href = "/index.html";
+    }
+</script>
+
+</body>
+</html>

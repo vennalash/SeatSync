@@ -1,0 +1,975 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync | Sports Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20243a;
+}
+
+.sidebar {
+    width: 245px;
+    background: #17152d;
+    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.logo span {
+    color: #a99bff;
+}
+
+.sidebar small {
+    color: #aaa5c8;
+    margin-bottom: 35px;
+}
+
+.nav-title {
+    font-size: 11px;
+    color: #8984a5;
+    margin: 18px 10px 12px;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: block;
+    padding: 13px;
+    margin-bottom: 7px;
+    color: #d3d0e3;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #6555dc;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.logout {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: white;
+    border: 1px solid #514b70;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background: #df465f;
+}
+
+.main {
+    margin-left: 245px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    gap: 15px;
+}
+
+.header h1 {
+    font-size: 27px;
+}
+
+.header p {
+    color: #888;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.admin-profile {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #eeeef5;
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.stat-card p {
+    color: #888;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    font-size: 30px;
+    margin-top: 12px;
+}
+
+.panel {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eeeef5;
+    padding: 24px;
+    margin-bottom: 25px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    font-size: 19px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.add-btn {
+    background: #6555dc;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-btn:hover {
+    background: #4c3bc5;
+}
+
+.search {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f7f6fc;
+    padding: 14px;
+    text-align: left;
+    color: #777;
+    font-size: 12px;
+}
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-active {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.status-inactive {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.action-btn {
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    margin: 2px;
+    font-size: 12px;
+}
+
+.edit-btn {
+    color: #6555dc;
+    background: #eeeaff;
+}
+
+.deactivate-btn {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.activate-btn {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 35px;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    z-index: 20;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+    background: white;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.cancel-btn {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #eee;
+}
+
+@media(max-width:850px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        margin-left: 190px;
+        padding: 20px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width:600px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-bottom {
+        margin-top: 20px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">Seat<span>Sync.</span></div>
+    <small>ADMINISTRATION PANEL</small>
+
+    <div class="nav-title">MAIN MENU</div>
+    <a href="/admin.html" class="nav-link">◈ Overview</a>
+
+    <div class="nav-title">MANAGEMENT</div>
+
+    <a href="/admin-movies.html" class="nav-link">🎬 Movies</a>
+    <a href="/admin-events.html" class="nav-link">🎟 Events</a>
+    <a href="/admin-hotels.html" class="nav-link">🏨 Hotels</a>
+    <a href="/admin-sports.html" class="nav-link active">🏆 Sports</a>
+    <a href="/admin-bookings.html" class="nav-link">📋 Bookings</a>
+    <a href="/admin-users.html" class="nav-link">👥 Users</a>
+
+    <div class="sidebar-bottom">
+        <button class="logout" onclick="logout()">↪ Logout</button>
+    </div>
+
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>Sports Management 🏆</h1>
+            <p>Manage all sports facilities available on SeatSync.</p>
+        </div>
+
+        <div class="admin-profile" id="adminName">
+            Administrator
+        </div>
+    </div>
+
+    <!-- STATISTICS -->
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <p>Total Facilities</p>
+            <h2 id="totalFacilities">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Active Facilities</p>
+            <h2 id="activeFacilities">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Inactive Facilities</p>
+            <h2 id="inactiveFacilities">0</h2>
+        </div>
+
+    </section>
+
+    <!-- FACILITIES -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h2>All Sports Facilities</h2>
+
+            <button class="add-btn" onclick="openAddForm()">
+                + Add Sports Facility
+            </button>
+        </div>
+
+        <div class="panel-header">
+
+            <input
+                type="text"
+                id="searchInput"
+                class="search"
+                placeholder="Search by facility, sport or city..."
+                oninput="searchFacilities()">
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Facility Name</th>
+                        <th>Sport Type</th>
+                        <th>City</th>
+                        <th>Address</th>
+                        <th>Price/Hour</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="sportsTable">
+                    <tr>
+                        <td colspan="8" class="empty">
+                            Loading facilities...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <p id="message"></p>
+
+    </section>
+
+</main>
+
+<!-- ADD / EDIT MODAL -->
+
+<div class="modal" id="sportsModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2 id="modalTitle">Add Sports Facility</h2>
+            <button class="close-btn" onclick="closeForm()">×</button>
+        </div>
+
+        <form id="sportsForm">
+
+            <input type="hidden" id="facilityId">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Facility Name *</label>
+                    <input id="name" required maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label>Sport Type *</label>
+                    <input
+                        id="sportType"
+                        placeholder="Badminton, Football, Cricket..."
+                        required
+                        maxlength="60">
+                </div>
+
+                <div class="field">
+                    <label>City *</label>
+                    <input id="city" required maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label>Price Per Hour (₹) *</label>
+                    <input
+                        id="pricePerHour"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        required>
+                </div>
+
+                <div class="field full">
+                    <label>Facility Address *</label>
+                    <input id="address" required maxlength="255">
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeForm()">
+                    Cancel
+                </button>
+
+                <button type="submit" class="add-btn" id="saveBtn">
+                    Add Facility
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+// ADMIN SESSION
+
+const userId = sessionStorage.getItem("seatsyncUserId");
+const role = sessionStorage.getItem("seatsyncRole");
+
+if (!userId || role !== "ADMIN") {
+    alert("Please login with your admin account.");
+    window.location.href = "/login.html";
+}
+
+document.getElementById("adminName").textContent =
+    sessionStorage.getItem("seatsyncName") || "Administrator";
+
+let allFacilities = [];
+
+// SAFE HTML
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+// LOAD FACILITIES
+
+async function loadFacilities() {
+
+    const table = document.getElementById("sportsTable");
+
+    table.innerHTML =
+        '<tr><td colspan="8" class="empty">Loading facilities...</td></tr>';
+
+    try {
+
+        const response = await fetch("/api/sports/admin/all", {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+
+            throw new Error(
+                "API Error " + response.status + ": " + errorText
+            );
+        }
+
+        allFacilities = await response.json();
+
+        updateStats();
+        displayFacilities(allFacilities);
+
+        document.getElementById("message").textContent =
+            "Sports facilities loaded successfully.";
+
+    } catch (error) {
+
+        table.innerHTML =
+            '<tr><td colspan="8" class="empty">Unable to load facilities.</td></tr>';
+
+        document.getElementById("message").textContent = error.message;
+
+    }
+}
+
+// UPDATE STATISTICS
+
+function updateStats() {
+
+    const active = allFacilities.filter(f => f.active);
+    const inactive = allFacilities.filter(f => !f.active);
+
+    document.getElementById("totalFacilities").textContent =
+        allFacilities.length;
+
+    document.getElementById("activeFacilities").textContent =
+        active.length;
+
+    document.getElementById("inactiveFacilities").textContent =
+        inactive.length;
+}
+
+// DISPLAY FACILITIES
+
+function displayFacilities(facilities) {
+
+    const table = document.getElementById("sportsTable");
+
+    if (!facilities.length) {
+        table.innerHTML =
+            '<tr><td colspan="8" class="empty">No sports facilities found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = facilities.map(facility => {
+
+        const status = facility.active
+            ? '<span class="status status-active">Active</span>'
+            : '<span class="status status-inactive">Inactive</span>';
+
+        const action = facility.active
+            ? `<button class="action-btn deactivate-btn"
+                onclick="changeStatus(${facility.id}, false)">
+                Deactivate
+               </button>`
+            : `<button class="action-btn activate-btn"
+                onclick="changeStatus(${facility.id}, true)">
+                Activate
+               </button>`;
+
+        return `
+            <tr>
+                <td>${facility.id}</td>
+                <td><strong>${escapeHTML(facility.name)}</strong></td>
+                <td>${escapeHTML(facility.sportType)}</td>
+                <td>${escapeHTML(facility.city)}</td>
+                <td>${escapeHTML(facility.address)}</td>
+                <td>₹${Number(facility.pricePerHour || 0).toFixed(2)}</td>
+                <td>${status}</td>
+                <td>
+                    <button class="action-btn edit-btn"
+                        onclick="editFacility(${facility.id})">
+                        Edit
+                    </button>
+                    ${action}
+                </td>
+            </tr>
+        `;
+
+    }).join("");
+}
+
+// SEARCH
+
+async function searchFacilities() {
+
+    const keyword = document.getElementById("searchInput")
+        .value.trim();
+
+    if (!keyword) {
+        displayFacilities(allFacilities);
+        return;
+    }
+
+    try {
+
+    	const response = await fetch("/api/sports/admin/all", {
+    	    method: "GET",
+    	    credentials: "same-origin",
+    	    headers: {
+    	        "Accept": "application/json"
+    	    }
+    	});
+
+    	console.log("Sports API status:", response.status);
+
+    	const responseData = await response.json();
+
+    	console.log("Sports API data:", responseData);
+
+    	allFacilities = responseData;
+    	updateStats();
+    	displayFacilities(allFacilities);
+        if (!response.ok) {
+            throw new Error("Search failed.");
+        }
+
+        const results = await response.json();
+        displayFacilities(results);
+
+    } catch (error) {
+
+        document.getElementById("message").textContent =
+            error.message;
+
+    }
+}
+
+// OPEN ADD FORM
+
+function openAddForm() {
+
+    document.getElementById("sportsForm").reset();
+    document.getElementById("facilityId").value = "";
+
+    document.getElementById("modalTitle").textContent =
+        "Add Sports Facility";
+
+    document.getElementById("saveBtn").textContent =
+        "Add Facility";
+
+    document.getElementById("sportsModal").classList.add("show");
+}
+
+// EDIT FACILITY
+
+function editFacility(id) {
+
+    const facility = allFacilities.find(item => item.id === id);
+
+    if (!facility) return;
+
+    document.getElementById("facilityId").value = facility.id;
+    document.getElementById("name").value = facility.name || "";
+    document.getElementById("sportType").value = facility.sportType || "";
+    document.getElementById("city").value = facility.city || "";
+    document.getElementById("address").value = facility.address || "";
+    document.getElementById("pricePerHour").value =
+        facility.pricePerHour ?? "";
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Sports Facility";
+
+    document.getElementById("saveBtn").textContent =
+        "Update Facility";
+
+    document.getElementById("sportsModal").classList.add("show");
+}
+
+// CLOSE FORM
+
+function closeForm() {
+    document.getElementById("sportsModal").classList.remove("show");
+}
+
+// ADD OR UPDATE
+
+document.getElementById("sportsForm").addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const id = document.getElementById("facilityId").value;
+
+        const facilityData = {
+
+            name: document.getElementById("name").value.trim(),
+
+            sportType: document.getElementById("sportType").value.trim(),
+
+            city: document.getElementById("city").value.trim(),
+
+            address: document.getElementById("address").value.trim(),
+
+            pricePerHour: Number(
+                document.getElementById("pricePerHour").value
+            )
+        };
+
+        if (
+            !facilityData.name ||
+            !facilityData.sportType ||
+            !facilityData.city ||
+            !facilityData.address ||
+            !Number.isFinite(facilityData.pricePerHour) ||
+            facilityData.pricePerHour <= 0
+        ) {
+            alert("Please enter valid facility details.");
+            return;
+        }
+
+        const saveBtn = document.getElementById("saveBtn");
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch(
+                id ? "/api/sports/" + id : "/api/sports",
+                {
+                    method: id ? "PUT" : "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify(facilityData)
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || "Unable to save facility.");
+            }
+
+            alert(id
+                ? "Sports facility updated successfully!"
+                : "Sports facility added successfully!"
+            );
+
+            closeForm();
+
+            document.getElementById("searchInput").value = "";
+
+            await loadFacilities();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        } finally {
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = id ? "Update Facility" : "Add Facility";
+
+        }
+
+    }
+);
+
+// ACTIVATE / DEACTIVATE
+
+async function changeStatus(id, activate) {
+
+    const action = activate ? "activate" : "deactivate";
+
+    if (!confirm("Are you sure you want to " + action + " this facility?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            activate
+                ? `/api/sports/${id}/activate`
+                : `/api/sports/${id}`,
+            {
+                method: activate ? "PUT" : "DELETE",
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to " + action + " facility.");
+        }
+
+        alert("Facility " + action + "d successfully!");
+
+        document.getElementById("searchInput").value = "";
+
+        await loadFacilities();
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+// LOGOUT
+
+async function logout() {
+
+    try {
+
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    sessionStorage.removeItem("seatsyncUserId");
+    sessionStorage.removeItem("seatsyncName");
+    sessionStorage.removeItem("seatsyncEmail");
+    sessionStorage.removeItem("seatsyncRole");
+
+    window.location.href = "/login.html";
+}
+
+// START
+
+loadFacilities();
+
+</script>
+
+</body>
+</html>

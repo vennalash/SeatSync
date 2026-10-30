@@ -1,0 +1,597 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync - Hotels & Stays</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f6ff;
+            color: #25204a;
+        }
+
+        header {
+            background: #25204a;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            padding: 35px 8%;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            margin: 22px 0;
+            box-shadow: 0 5px 15px #00000010;
+        }
+
+        .filter-section h3 {
+            margin-top: 0;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            align-items: center;
+        }
+
+        .filters input,
+        .filters select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            background: white;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: #6254e8;
+        }
+
+        .available-filter {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 14px;
+        }
+
+        .available-filter input {
+            width: auto;
+        }
+
+        .reset-btn {
+            background: #25204a;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .reset-btn:hover {
+            background: #493bc5;
+        }
+
+        #hotelList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+        }
+
+        .hotel-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px #00000015;
+            transition: transform 0.3s;
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .hotel-image {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+            display: block;
+            background: #e5e5ee;
+        }
+
+        .hotel-info {
+            padding: 20px;
+        }
+
+        .hotel-card h2 {
+            margin: 0 0 12px;
+            font-size: 21px;
+        }
+
+        .hotel-info p {
+            color: #666;
+            line-height: 1.5;
+            margin: 9px 0;
+        }
+
+        .hotel-price {
+            color: #493bc5 !important;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .hotel-card button {
+            width: 100%;
+            background: #6254e8;
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 12px;
+        }
+
+        .hotel-card button:hover {
+            background: #493bc5;
+        }
+
+        .hotel-card button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .no-results {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            text-align: center;
+            color: #777;
+            grid-column: 1 / -1;
+        }
+
+        @media(max-width: 600px) {
+            main {
+                padding: 25px 5%;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1><a href="/index.html">SeatSync</a></h1>
+    <p>Find your perfect stay</p>
+</header>
+
+<main>
+
+    <h1>Hotels & Stays</h1>
+
+    <section class="filter-section">
+
+        <h3>Find Your Hotel</h3>
+
+        <div class="filters">
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Search hotel or city..."
+            >
+
+            <select id="cityFilter">
+                <option value="ALL">All Cities</option>
+            </select>
+
+            <select id="priceFilter">
+                <option value="ALL">All Price Ranges</option>
+                <option value="0-2000">Below ₹2,000</option>
+                <option value="2000-4000">₹2,000 - ₹4,000</option>
+                <option value="4000-6000">₹4,000 - ₹6,000</option>
+                <option value="6000-10000">₹6,000 - ₹10,000</option>
+                <option value="10000-999999">Above ₹10,000</option>
+            </select>
+
+            <select id="sortFilter">
+                <option value="DEFAULT">Sort By: Default</option>
+                <option value="LOW">Price: Low to High</option>
+                <option value="HIGH">Price: High to Low</option>
+                <option value="NAME">Hotel Name: A to Z</option>
+            </select>
+
+            <label class="available-filter">
+                <input type="checkbox" id="availableOnly">
+                Available rooms only
+            </label>
+
+            <button class="reset-btn" id="resetButton">
+                Reset Filters
+            </button>
+
+        </div>
+
+    </section>
+
+    <p id="message">Loading hotels...</p>
+
+    <div id="hotelList"></div>
+
+</main>
+
+<script>
+
+    const hotelImages = [
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800",
+        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800",
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800",
+        "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800",
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800",
+        "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800",
+        "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800",
+        "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800",
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
+        "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=800",
+        "https://images.unsplash.com/photo-1518732714860-b62714ce0c59?w=800"
+    ];
+
+    let allHotels = [];
+
+    const list = document.getElementById("hotelList");
+    const message = document.getElementById("message");
+
+    const searchInput = document.getElementById("searchInput");
+    const cityFilter = document.getElementById("cityFilter");
+    const priceFilter = document.getElementById("priceFilter");
+    const sortFilter = document.getElementById("sortFilter");
+    const availableOnly = document.getElementById("availableOnly");
+    const resetButton = document.getElementById("resetButton");
+
+
+    async function loadHotels() {
+
+        try {
+
+            const response = await fetch("/api/hotels");
+
+            if (!response.ok) {
+                throw new Error("Could not load hotels");
+            }
+
+            const hotels = await response.json();
+
+            allHotels = Array.isArray(hotels) ? hotels : [];
+
+            populateCities();
+            applyFilters();
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "Unable to load hotels. Please try again.";
+
+        }
+    }
+
+
+    function populateCities() {
+
+        const cities = [
+            ...new Set(
+                allHotels
+                    .map(hotel => hotel.city)
+                    .filter(city => city && city.trim())
+            )
+        ].sort();
+
+        cityFilter.innerHTML =
+            '<option value="ALL">All Cities</option>';
+
+        cities.forEach(city => {
+
+            const option = document.createElement("option");
+
+            option.value = city;
+            option.textContent = city;
+
+            cityFilter.appendChild(option);
+
+        });
+
+    }
+
+
+    function applyFilters() {
+
+        const search = searchInput.value.trim().toLowerCase();
+
+        const selectedCity = cityFilter.value;
+
+        const selectedPrice = priceFilter.value;
+
+        const sort = sortFilter.value;
+
+        let filtered = allHotels.filter(hotel => {
+
+            const name = (hotel.name || "").toLowerCase();
+
+            const city = (hotel.city || "").toLowerCase();
+
+            const matchesSearch =
+                name.includes(search) || city.includes(search);
+
+            const matchesCity =
+                selectedCity === "ALL" ||
+                hotel.city === selectedCity;
+
+            let matchesPrice = true;
+
+            const price = Number(hotel.pricePerNight || 0);
+
+            if (selectedPrice !== "ALL") {
+
+                const range = selectedPrice.split("-");
+
+                const min = Number(range[0]);
+
+                const max = Number(range[1]);
+
+                matchesPrice = price >= min && price < max;
+
+            }
+
+            const matchesAvailability =
+                !availableOnly.checked ||
+                Number(hotel.availableRooms || 0) > 0;
+
+            return matchesSearch &&
+                matchesCity &&
+                matchesPrice &&
+                matchesAvailability;
+
+        });
+
+
+        // Sorting
+
+        if (sort === "LOW") {
+
+            filtered.sort(
+                (a, b) =>
+                    Number(a.pricePerNight) -
+                    Number(b.pricePerNight)
+            );
+
+        } else if (sort === "HIGH") {
+
+            filtered.sort(
+                (a, b) =>
+                    Number(b.pricePerNight) -
+                    Number(a.pricePerNight)
+            );
+
+        } else if (sort === "NAME") {
+
+            filtered.sort(
+                (a, b) =>
+                    (a.name || "").localeCompare(b.name || "")
+            );
+
+        }
+
+
+        displayHotels(filtered);
+
+    }
+
+
+    function displayHotels(hotels) {
+
+        list.innerHTML = "";
+
+        if (hotels.length === 0) {
+
+            message.textContent = "No matching hotels found.";
+
+            const empty = document.createElement("div");
+
+            empty.className = "no-results";
+
+            empty.textContent =
+                "No hotels match your filters. Try changing your search.";
+
+            list.appendChild(empty);
+
+            return;
+
+        }
+
+        message.textContent =
+            "Showing " + hotels.length + " of " +
+            allHotels.length + " hotel(s).";
+
+
+        hotels.forEach(hotel => {
+
+            const originalIndex = allHotels.findIndex(
+                item => Number(item.id) === Number(hotel.id)
+            );
+
+            const card = document.createElement("div");
+
+            card.className = "hotel-card";
+
+
+            // Hotel image
+
+            const image = document.createElement("img");
+
+            image.className = "hotel-image";
+
+            image.src =
+                hotelImages[
+                    (originalIndex >= 0 ? originalIndex : 0) %
+                    hotelImages.length
+                ];
+
+            image.alt = hotel.name || "Hotel";
+
+            image.loading = "lazy";
+
+            image.onerror = function() {
+
+                this.onerror = null;
+
+                this.src =
+                    hotelImages[0];
+
+            };
+
+
+            // Hotel details
+
+            const info = document.createElement("div");
+
+            info.className = "hotel-info";
+
+            const title = document.createElement("h2");
+
+            title.textContent = hotel.name;
+
+            const city = document.createElement("p");
+
+            city.textContent =
+                "📍 City: " + (hotel.city || "N/A");
+
+            const address = document.createElement("p");
+
+            address.textContent =
+                "Address: " + (hotel.address || "N/A");
+
+            const price = document.createElement("p");
+
+            price.className = "hotel-price";
+
+            price.textContent =
+                "₹" + Number(hotel.pricePerNight || 0).toLocaleString("en-IN") +
+                " / night";
+
+            const rooms = document.createElement("p");
+
+            rooms.textContent =
+                "Available rooms: " +
+                (hotel.availableRooms ?? 0);
+
+            const description = document.createElement("p");
+
+            description.textContent =
+                hotel.description || "No description available.";
+
+            const button = document.createElement("button");
+
+            button.textContent =
+                Number(hotel.availableRooms || 0) > 0
+                ? "Book Now"
+                : "Sold Out";
+
+            button.disabled =
+                Number(hotel.availableRooms || 0) <= 0;
+
+            button.onclick = function() {
+
+                window.location.href =
+                    "/booking.html?type=HOTEL&id=" + hotel.id;
+
+            };
+
+
+            info.append(
+                title,
+                city,
+                address,
+                price,
+                rooms,
+                description,
+                button
+            );
+
+            card.append(image, info);
+
+            list.appendChild(card);
+
+        });
+
+    }
+
+
+    // Filter event listeners
+
+    searchInput.addEventListener("input", applyFilters);
+
+    cityFilter.addEventListener("change", applyFilters);
+
+    priceFilter.addEventListener("change", applyFilters);
+
+    sortFilter.addEventListener("change", applyFilters);
+
+    availableOnly.addEventListener("change", applyFilters);
+
+
+    // Reset all filters
+
+    resetButton.addEventListener("click", function() {
+
+        searchInput.value = "";
+
+        cityFilter.value = "ALL";
+
+        priceFilter.value = "ALL";
+
+        sortFilter.value = "DEFAULT";
+
+        availableOnly.checked = false;
+
+        applyFilters();
+
+    });
+
+
+    // Load hotels
+
+    loadHotels();
+
+</script>
+
+</body>
+</html>

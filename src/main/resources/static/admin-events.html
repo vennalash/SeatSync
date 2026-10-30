@@ -1,0 +1,1029 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync | Admin Event Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20243a;
+}
+
+.sidebar {
+    width: 245px;
+    background: #17152d;
+    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.logo span {
+    color: #a99bff;
+}
+
+.sidebar small {
+    color: #aaa5c8;
+    margin-bottom: 35px;
+}
+
+.nav-title {
+    font-size: 11px;
+    color: #8984a5;
+    margin: 18px 10px 12px;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: block;
+    padding: 13px;
+    margin-bottom: 7px;
+    color: #d3d0e3;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #6555dc;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.logout {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: white;
+    border: 1px solid #514b70;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background: #df465f;
+}
+
+.main {
+    margin-left: 245px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    gap: 15px;
+}
+
+.header h1 {
+    font-size: 27px;
+}
+
+.header p {
+    color: #888;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.admin-profile {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #eeeef5;
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.stat-card p {
+    color: #888;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    font-size: 30px;
+    margin-top: 12px;
+}
+
+.panel {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eeeef5;
+    padding: 24px;
+    margin-bottom: 25px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    font-size: 19px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.add-btn {
+    background: #6555dc;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-btn:hover {
+    background: #4c3bc5;
+}
+
+.add-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.search {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f7f6fc;
+    padding: 14px;
+    text-align: left;
+    color: #777;
+    font-size: 12px;
+}
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-active {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.status-inactive {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.action-btn {
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    margin: 2px;
+    font-size: 12px;
+}
+
+.edit-btn {
+    color: #6555dc;
+    background: #eeeaff;
+}
+
+.deactivate-btn {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.activate-btn {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 35px;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.field input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.cancel-btn {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #eee;
+}
+
+@media(max-width:850px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        margin-left: 190px;
+        padding: 20px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width:600px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-bottom {
+        margin-top: 20px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">Seat<span>Sync.</span></div>
+    <small>ADMINISTRATION PANEL</small>
+
+    <div class="nav-title">MAIN MENU</div>
+    <a href="/admin.html" class="nav-link">◈ Overview</a>
+
+    <div class="nav-title">MANAGEMENT</div>
+
+    <a href="/admin-movies.html" class="nav-link">🎬 Movies</a>
+    <a href="/admin-events.html" class="nav-link active">🎟 Events</a>
+    <a href="/admin-hotels.html" class="nav-link">🏨 Hotels</a>
+    <a href="/admin.html#management" class="nav-link">🏆 Sports</a>
+    <a href="/admin.html#bookings" class="nav-link">📋 Bookings</a>
+    <a href="/admin.html#users" class="nav-link">👥 Users</a>
+
+    <div class="sidebar-bottom">
+        <button class="logout" onclick="logout()">↪ Logout</button>
+    </div>
+
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>Event Management 🎟</h1>
+            <p>Manage all events available on SeatSync.</p>
+        </div>
+
+        <div class="admin-profile" id="adminName">
+            Administrator
+        </div>
+    </div>
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <p>Total Events</p>
+            <h2 id="totalEvents">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Active Events</p>
+            <h2 id="activeEvents">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Inactive Events</p>
+            <h2 id="inactiveEvents">0</h2>
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h2>All Events</h2>
+
+            <button class="add-btn" onclick="openAddForm()">
+                + Add New Event
+            </button>
+        </div>
+
+        <div class="panel-header">
+            <input
+                type="text"
+                id="searchInput"
+                class="search"
+                placeholder="Search event by name or category..."
+                oninput="searchEvents()">
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Event Name</th>
+                        <th>Category</th>
+                        <th>Venue</th>
+                        <th>City</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Total Tickets</th>
+                        <th>Available Tickets</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="eventTable">
+                    <tr>
+                        <td colspan="11" class="empty">
+                            Loading events...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <p id="message"></p>
+
+    </section>
+
+</main>
+
+<!-- ADD / EDIT EVENT MODAL -->
+
+<div class="modal" id="eventModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2 id="modalTitle">Add New Event</h2>
+            <button class="close-btn" onclick="closeForm()">×</button>
+        </div>
+
+        <form id="eventForm">
+
+            <input type="hidden" id="eventId">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Event Name *</label>
+                    <input id="name" required maxlength="150">
+                </div>
+
+                <div class="field">
+                    <label>Category *</label>
+                    <input id="category" required maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label>Venue *</label>
+                    <input id="venue" required maxlength="200">
+                </div>
+
+                <div class="field">
+                    <label>City *</label>
+                    <input id="city" required maxlength="100">
+                </div>
+
+                <div class="field">
+                    <label>Event Date *</label>
+                    <input id="eventDate" type="date" required>
+                </div>
+
+                <div class="field">
+                    <label>Ticket Price (₹) *</label>
+                    <input
+                        id="ticketPrice"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label>Total Tickets *</label>
+                    <input
+                        id="totalTickets"
+                        type="number"
+                        min="1"
+                        step="1"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label>Available Tickets *</label>
+                    <input
+                        id="availableTickets"
+                        type="number"
+                        min="0"
+                        step="1"
+                        required>
+                </div>
+
+                <div class="field full">
+                    <label>Event Image URL</label>
+                    <input
+                        id="imageUrl"
+                        type="url"
+                        placeholder="https://example.com/event.jpg">
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="closeForm()">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="add-btn"
+                    id="saveBtn">
+                    Add Event
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+// ADMIN SESSION
+
+const userId = sessionStorage.getItem("seatsyncUserId");
+const role = sessionStorage.getItem("seatsyncRole");
+
+if (!userId || role !== "ADMIN") {
+    alert("Please login with your admin account.");
+    window.location.href = "/login.html";
+}
+
+document.getElementById("adminName").textContent =
+    sessionStorage.getItem("seatsyncName") || "Administrator";
+
+let allEvents = [];
+
+// SAFE TEXT
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+// LOAD EVENTS
+
+async function loadEvents() {
+
+    const table = document.getElementById("eventTable");
+
+    table.innerHTML =
+        '<tr><td colspan="11" class="empty">Loading events...</td></tr>';
+
+    try {
+
+        const response = await fetch("/api/events/admin/all", {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                response.status === 403
+                    ? "Admin access denied. Please login again."
+                    : "Unable to load events."
+            );
+        }
+
+        allEvents = await response.json();
+
+        updateStats();
+        displayEvents(allEvents);
+
+        document.getElementById("message").textContent =
+            "Events loaded successfully.";
+
+    } catch (error) {
+
+        table.innerHTML =
+            '<tr><td colspan="11" class="empty">Unable to load events.</td></tr>';
+
+        document.getElementById("message").textContent = error.message;
+    }
+}
+
+// UPDATE STATISTICS
+
+function updateStats() {
+
+    const active = allEvents.filter(event => event.active);
+    const inactive = allEvents.filter(event => !event.active);
+
+    document.getElementById("totalEvents").textContent =
+        allEvents.length;
+
+    document.getElementById("activeEvents").textContent =
+        active.length;
+
+    document.getElementById("inactiveEvents").textContent =
+        inactive.length;
+}
+
+// DISPLAY EVENTS
+
+function displayEvents(events) {
+
+    const table = document.getElementById("eventTable");
+
+    if (!events.length) {
+        table.innerHTML =
+            '<tr><td colspan="11" class="empty">No events found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = events.map(event => {
+
+        const status = event.active
+            ? '<span class="status status-active">Active</span>'
+            : '<span class="status status-inactive">Inactive</span>';
+
+        const action = event.active
+            ? `<button class="action-btn deactivate-btn"
+                onclick="changeStatus(${event.id}, false)">
+                Deactivate
+              </button>`
+            : `<button class="action-btn activate-btn"
+                onclick="changeStatus(${event.id}, true)">
+                Activate
+              </button>`;
+
+        return `
+            <tr>
+                <td>${event.id}</td>
+                <td><strong>${escapeHTML(event.name)}</strong></td>
+                <td>${escapeHTML(event.category || "-")}</td>
+                <td>${escapeHTML(event.venue || "-")}</td>
+                <td>${escapeHTML(event.city || "-")}</td>
+                <td>${escapeHTML(event.eventDate || "-")}</td>
+                <td>₹${Number(event.ticketPrice || 0).toFixed(2)}</td>
+                <td>${event.totalTickets ?? 0}</td>
+                <td>${event.availableTickets ?? 0}</td>
+                <td>${status}</td>
+                <td>
+                    <button class="action-btn edit-btn"
+                        onclick="editEvent(${event.id})">
+                        Edit
+                    </button>
+                    ${action}
+                </td>
+            </tr>
+        `;
+
+    }).join("");
+}
+
+// SEARCH EVENTS
+
+async function searchEvents() {
+
+    const keyword = document.getElementById("searchInput")
+        .value.trim();
+
+    if (!keyword) {
+        displayEvents(allEvents);
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/events/admin/search?keyword=" +
+            encodeURIComponent(keyword),
+            { credentials: "same-origin" }
+        );
+
+        if (!response.ok) {
+            throw new Error("Search failed.");
+        }
+
+        const results = await response.json();
+
+        displayEvents(results);
+
+    } catch (error) {
+
+        document.getElementById("message").textContent =
+            error.message;
+    }
+}
+
+// OPEN ADD FORM
+
+function openAddForm() {
+
+    document.getElementById("eventForm").reset();
+    document.getElementById("eventId").value = "";
+
+    document.getElementById("modalTitle").textContent =
+        "Add New Event";
+
+    document.getElementById("saveBtn").textContent =
+        "Add Event";
+
+    document.getElementById("totalTickets").value = 100;
+    document.getElementById("availableTickets").value = 100;
+
+    document.getElementById("eventModal").classList.add("show");
+}
+
+// EDIT EVENT
+
+function editEvent(id) {
+
+    const event = allEvents.find(item => item.id === id);
+
+    if (!event) return;
+
+    document.getElementById("eventId").value = event.id;
+    document.getElementById("name").value = event.name || "";
+    document.getElementById("category").value = event.category || "";
+    document.getElementById("venue").value = event.venue || "";
+    document.getElementById("city").value = event.city || "";
+    document.getElementById("eventDate").value = event.eventDate || "";
+    document.getElementById("ticketPrice").value =
+        event.ticketPrice ?? "";
+
+    document.getElementById("totalTickets").value =
+        event.totalTickets ?? "";
+
+    document.getElementById("availableTickets").value =
+        event.availableTickets ?? "";
+
+    document.getElementById("imageUrl").value =
+        event.imageUrl || "";
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Event";
+
+    document.getElementById("saveBtn").textContent =
+        "Update Event";
+
+    document.getElementById("eventModal").classList.add("show");
+}
+
+// CLOSE FORM
+
+function closeForm() {
+    document.getElementById("eventModal").classList.remove("show");
+}
+
+// VALIDATE AVAILABLE TICKETS
+
+document.getElementById("totalTickets").addEventListener("input", function() {
+    document.getElementById("availableTickets").max = this.value;
+});
+
+// ADD OR UPDATE EVENT
+
+document.getElementById("eventForm").addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const id = document.getElementById("eventId").value;
+
+        const totalTickets = Number(
+            document.getElementById("totalTickets").value
+        );
+
+        const availableTickets = Number(
+            document.getElementById("availableTickets").value
+        );
+
+        const ticketPrice = Number(
+            document.getElementById("ticketPrice").value
+        );
+
+        if (!Number.isInteger(totalTickets) ||
+            !Number.isInteger(availableTickets) ||
+            totalTickets < 1 ||
+            availableTickets < 0 ||
+            availableTickets > totalTickets) {
+
+            alert("Please enter valid ticket quantities.");
+            return;
+        }
+
+        if (!Number.isFinite(ticketPrice) || ticketPrice <= 0) {
+            alert("Please enter a valid ticket price.");
+            return;
+        }
+
+        const eventData = {
+
+            name: document.getElementById("name").value.trim(),
+
+            category: document.getElementById("category").value.trim(),
+
+            venue: document.getElementById("venue").value.trim(),
+
+            city: document.getElementById("city").value.trim(),
+
+            eventDate: document.getElementById("eventDate").value,
+
+            ticketPrice: ticketPrice,
+
+            totalTickets: totalTickets,
+
+            availableTickets: availableTickets,
+
+            imageUrl: document.getElementById("imageUrl").value.trim()
+        };
+
+        const saveBtn = document.getElementById("saveBtn");
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch(
+                id ? "/api/events/" + id : "/api/events",
+                {
+                    method: id ? "PUT" : "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify(eventData)
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || "Unable to save event.");
+            }
+
+            alert(id
+                ? "Event updated successfully!"
+                : "Event added successfully!"
+            );
+
+            closeForm();
+
+            document.getElementById("searchInput").value = "";
+
+            await loadEvents();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        } finally {
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = id ? "Update Event" : "Add Event";
+        }
+    }
+);
+
+// ACTIVATE / DEACTIVATE
+
+async function changeStatus(id, activate) {
+
+    const action = activate ? "activate" : "deactivate";
+
+    if (!confirm("Are you sure you want to " + action + " this event?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            activate
+                ? `/api/events/${id}/activate`
+                : `/api/events/${id}`,
+            {
+                method: activate ? "PUT" : "DELETE",
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to " + action + " event.");
+        }
+
+        alert("Event " + action + "d successfully!");
+
+        document.getElementById("searchInput").value = "";
+
+        await loadEvents();
+
+    } catch (error) {
+
+        alert(error.message);
+    }
+}
+
+// LOGOUT
+
+async function logout() {
+
+    try {
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
+    sessionStorage.clear();
+    window.location.href = "/login.html";
+}
+
+// START
+
+loadEvents();
+
+</script>
+
+</body>
+</html>

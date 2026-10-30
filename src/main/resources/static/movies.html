@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync | Movies</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7ff;
+            color: #172033;
+        }
+
+        header {
+            background: white;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px #00000010;
+        }
+
+        .logo {
+            color: #5546e8;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        header a {
+            color: #5546e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        main {
+    width: 92%;
+    max-width: 1500px;
+    margin: 35px auto;
+}
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #687086;
+            margin-bottom: 25px;
+        }
+
+        /* Responsive movie grid */
+        #movieList {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
+}
+
+        /* Movie card */
+        .movie-card {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            padding: 18px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 5px 15px #00000008;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px #00000012;
+        }
+
+        .movie-card img {
+            display: block;
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            background: #25204a;
+            border-radius: 10px;
+        }
+
+        .movie-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .movie-card h2 {
+            color: #5546e8;
+            font-size: 20px;
+            line-height: 1.35;
+            margin: 16px 0 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .movie-card p {
+            color: #555;
+            line-height: 1.5;
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .movie-card .price {
+            color: #172033;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .movie-card button {
+            width: 100%;
+            border: none;
+            background: #5546e8;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: auto;
+        }
+
+        .movie-card button:hover {
+            background: #4032ca;
+        }
+
+        #message {
+            color: #687086;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1000px) {
+            #movieList {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            main {
+                width: 92%;
+                margin: 24px auto;
+            }
+
+            #movieList {
+                grid-template-columns: 1fr;
+            }
+
+            .movie-card img {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SeatSync.</div>
+    <a href="/">← Back to Home</a>
+</header>
+
+<main>
+   <h1>Explore Movies</h1>
+<p class="subtitle">Discover movies available on SeatSync.</p>
+
+<input
+    type="text"
+    id="searchInput"
+    placeholder="Search movies by title or language..."
+    style="width:100%; padding:14px; margin-bottom:24px;
+           border:1px solid #ddd; border-radius:10px;
+           font-size:16px;"
+>
+
+<div id="movieList"></div>
+    <p id="message">Loading movies...</p>
+</main>
+
+<script>
+    async function loadMovies() {
+        const list = document.getElementById("movieList");
+        const message = document.getElementById("message");
+
+        try {
+            const response = await fetch("/api/movies");
+
+            if (!response.ok) {
+                throw new Error("Could not load movies");
+            }
+
+            const movies = await response.json();
+            list.innerHTML = "";
+
+            if (!movies.length) {
+                message.textContent = "No movies available yet.";
+                return;
+            }
+
+            message.textContent =
+                movies.length + " movie(s) available.";
+
+            movies.forEach(movie => {
+                const card = document.createElement("div");
+                card.className = "movie-card";
+
+                const poster = document.createElement("img");
+
+                const fallbackPoster =
+                    "https://placehold.co/400x600/25204a/ffffff?text=Movie+Poster";
+
+                poster.src = movie.posterUrl || fallbackPoster;
+                poster.alt = movie.title + " poster";
+                poster.onerror = function () {
+                    this.onerror = null;
+                    this.src = fallbackPoster;
+                };
+
+                const details = document.createElement("div");
+                details.className = "movie-details";
+
+                const title = document.createElement("h2");
+                title.textContent = movie.title;
+
+                const genre = document.createElement("p");
+                genre.textContent =
+                    "Genre: " + (movie.genre || "Not specified");
+
+                const language = document.createElement("p");
+                language.textContent =
+                    "Language: " + (movie.language || "Not specified");
+
+                const duration = document.createElement("p");
+                duration.textContent = "Duration: " +
+                    (movie.durationMinutes || "N/A") +
+                    (movie.durationMinutes ? " minutes" : "");
+
+                const description = document.createElement("p");
+                description.textContent =
+                    movie.description || "No description available.";
+
+                const price = document.createElement("p");
+                price.className = "price";
+                price.textContent = "Ticket price: ₹" +
+                    (movie.ticketPrice ?? "Check show details");
+
+                const bookButton = document.createElement("button");
+                bookButton.textContent = "Book Tickets";
+
+                bookButton.addEventListener("click", function () {
+                    window.location.href =
+                        "/seats.html?type=MOVIE&id=" + movie.id;
+                });
+
+                details.append(
+                    title,
+                    genre,
+                    language,
+                    duration,
+                    description,
+                    price,
+                    bookButton
+                );
+
+                card.append(poster, details);
+                list.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error("Movie loading error:", error);
+            message.textContent =
+                "Unable to load movies. Please try again.";
+        }
+    }
+
+
+    let allMovies = [];
+
+    async function loadMovies() {
+        const list = document.getElementById("movieList");
+        const message = document.getElementById("message");
+
+        try {
+            const response = await fetch("/api/movies");
+
+            if (!response.ok) {
+                throw new Error("Could not load movies");
+            }
+
+            allMovies = await response.json();
+            displayMovies(allMovies);
+
+        } catch (error) {
+            console.error(error);
+            message.textContent = "Unable to load movies. Please try again.";
+        }
+    }
+
+    function displayMovies(movies) {
+        const list = document.getElementById("movieList");
+        const message = document.getElementById("message");
+
+        list.innerHTML = "";
+
+        if (movies.length === 0) {
+            message.textContent = "No matching movies found.";
+            return;
+        }
+
+        message.textContent = movies.length + " movie(s) found.";
+
+        movies.forEach(movie => {
+            const card = document.createElement("div");
+            card.className = "movie-card";
+
+            const poster = document.createElement("img");
+            poster.src = movie.posterUrl ||
+                "https://placehold.co/400x600/25204a/ffffff?text=Movie+Poster";
+            poster.alt = movie.title + " poster";
+            poster.onerror = function () {
+                this.onerror = null;
+                this.src =
+                    "https://placehold.co/400x600/25204a/ffffff?text=Movie+Poster";
+            };
+
+            const details = document.createElement("div");
+            details.className = "movie-details";
+
+            const title = document.createElement("h2");
+            title.textContent = movie.title;
+
+            const genre = document.createElement("p");
+            genre.textContent = "Genre: " + (movie.genre || "Not specified");
+
+            const language = document.createElement("p");
+            language.textContent = "Language: " + (movie.language || "Not specified");
+
+            const duration = document.createElement("p");
+            duration.textContent = "Duration: " +
+                (movie.durationMinutes || "N/A") +
+                (movie.durationMinutes ? " minutes" : "");
+
+            const description = document.createElement("p");
+            description.textContent =
+                movie.description || "No description available.";
+
+            const price = document.createElement("p");
+            price.className = "price";
+            price.textContent = "Ticket price: ₹" +
+                (movie.ticketPrice ?? "Check show details");
+
+            const button = document.createElement("button");
+            button.textContent = "Book Tickets";
+            button.addEventListener("click", function () {
+                window.location.href =
+                    "/seats.html?type=MOVIE&id=" + movie.id;
+            });
+
+            details.append(
+                title, genre, language, duration,
+                description, price, button
+            );
+
+            card.append(poster, details);
+            list.appendChild(card);
+        });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const query = this.value.trim().toLowerCase();
+
+        const filteredMovies = allMovies.filter(movie =>
+            (movie.title || "").toLowerCase().includes(query) ||
+            (movie.language || "").toLowerCase().includes(query)
+        );
+
+        displayMovies(filteredMovies);
+    });
+
+    loadMovies();
+
+</script>
+
+</body>
+</html>

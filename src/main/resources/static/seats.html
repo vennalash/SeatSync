@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync - Select Seats</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6ff;
+            color: #25204a;
+        }
+
+        header {
+            background: #25204a;
+            color: white;
+            padding: 20px 7%;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .seat-box {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px #00000010;
+            text-align: center;
+        }
+
+        .cinema-info {
+            background: #f0eeff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        .cinema-info h3 {
+            margin-top: 0;
+            color: #493bc5;
+        }
+
+        .cinema-info p {
+            margin: 5px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .show-card {
+            border: 1px solid #dedbff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+
+        .show-card.active-show {
+            border: 2px solid #6254e8;
+            background: #f8f7ff;
+        }
+
+        .select-show-button {
+            background: #6254e8;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .select-show-button:disabled {
+            background: #9ca3af;
+            cursor: default;
+        }
+
+        .screen {
+            background: #dedbff;
+            padding: 12px;
+            margin: 25px auto 35px;
+            max-width: 480px;
+            border-radius: 50% 50% 8px 8px;
+            color: #493bc5;
+            font-weight: bold;
+        }
+
+        .seat-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            margin: 12px 0;
+        }
+
+        .row-label {
+            width: 22px;
+            font-weight: bold;
+        }
+
+        .seat {
+            width: 38px;
+            height: 34px;
+            border: none;
+            border-radius: 7px 7px 4px 4px;
+            background: #d7f5e8;
+            color: #176b4a;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .seat.selected {
+            background: #6254e8;
+            color: white;
+        }
+
+        .seat.booked {
+            background: #d1d5db;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .color-box {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .available-color {
+            background: #d7f5e8;
+        }
+
+        .selected-color {
+            background: #6254e8;
+        }
+
+        .booked-color {
+            background: #d1d5db;
+        }
+
+        #confirmButton {
+            background: #6254e8;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        #confirmButton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #message {
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 500px) {
+            .seat-row {
+                gap: 5px;
+            }
+
+            .seat {
+                width: 29px;
+                height: 30px;
+                font-size: 10px;
+            }
+
+            .seat-box {
+                padding: 15px 5px;
+            }
+
+            main {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h2><a href="/index.html">SeatSync</a></h2>
+    <p>Choose your cinema, show and seats</p>
+</header>
+
+<main>
+    <div class="seat-box">
+        <h1>Select Your Seats</h1>
+
+        <p id="movieInfo">Loading movie...</p>
+
+        <h2>Choose Cinema & Show</h2>
+        <div id="cinemaInfo" class="cinema-info">
+            Loading cinema shows...
+        </div>
+
+        <div id="seatSection" hidden>
+            <h2 id="selectedShowHeading">Selected Show</h2>
+            <div id="selectedShowInfo" class="cinema-info"></div>
+
+            <div class="screen">SCREEN THIS WAY</div>
+            <div id="seatLayout">Loading seats...</div>
+
+            <div class="legend">
+                <span>
+                    <i class="color-box available-color"></i>
+                    Available
+                </span>
+                <span>
+                    <i class="color-box selected-color"></i>
+                    Selected
+                </span>
+                <span>
+                    <i class="color-box booked-color"></i>
+                    Booked
+                </span>
+            </div>
+
+            <h3>
+                Selected Seats:
+                <span id="selectedSeats">None</span>
+            </h3>
+
+            <h2>
+                Total: ₹<span id="totalPrice">0</span>
+            </h2>
+
+            <button id="confirmButton" disabled>
+                Continue to Booking
+            </button>
+        </div>
+
+        <p id="message" role="status" aria-live="polite"></p>
+    </div>
+</main>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const movieId = Number(params.get("id"));
+    const serviceType = (params.get("type") || "MOVIE").toUpperCase();
+
+    const seatLayout = document.getElementById("seatLayout");
+    const selectedSeatsText = document.getElementById("selectedSeats");
+    const totalPriceText = document.getElementById("totalPrice");
+    const confirmButton = document.getElementById("confirmButton");
+    const message = document.getElementById("message");
+    const cinemaInfo = document.getElementById("cinemaInfo");
+    const seatSection = document.getElementById("seatSection");
+
+    const selectedSeats = new Set();
+
+    let bookedSeats = new Set();
+    let pricePerSeat = 250;
+    let selectedShow = null;
+    let refreshTimer = null;
+
+    async function loadSeats() {
+        if (!Number.isInteger(movieId) || movieId <= 0 ||
+            serviceType !== "MOVIE") {
+            showError("Invalid movie booking link.");
+            return;
+        }
+
+        try {
+            const movieResponse = await fetch("/api/movies");
+
+            if (!movieResponse.ok) {
+                throw new Error("Could not load movie details.");
+            }
+
+            const movies = await movieResponse.json();
+
+            const movie = movies.find(
+                item => Number(item.id) === movieId
+            );
+
+            if (!movie) {
+                throw new Error("Movie not found.");
+            }
+
+            document.getElementById("movieInfo").textContent =
+                movie.title;
+
+            const showResponse = await fetch(
+                "/api/movie-shows/movie/" + movieId
+            );
+
+            if (!showResponse.ok) {
+                throw new Error("Could not load cinema shows.");
+            }
+
+            const shows = await showResponse.json();
+
+            cinemaInfo.replaceChildren();
+
+            if (!shows.length) {
+                cinemaInfo.textContent = "No cinema shows available.";
+                return;
+            }
+
+            shows.forEach(show => {
+                const card = document.createElement("div");
+                card.className = "show-card";
+
+                const heading = document.createElement("h3");
+                heading.textContent = show.cinemaName || "Cinema";
+                card.appendChild(heading);
+
+                const details = [
+                    ["City", show.city],
+                    ["Address", show.theaterAddress],
+                    ["Show Date", show.showDate],
+                    ["Show Time", show.showTime],
+                    ["Ticket Price", "₹" + show.ticketPrice]
+                ];
+
+                details.forEach(([label, value]) => {
+                    const paragraph = document.createElement("p");
+                    const strong = document.createElement("strong");
+
+                    strong.textContent = label + ": ";
+                    paragraph.appendChild(strong);
+                    paragraph.appendChild(
+                        document.createTextNode(value || "Not available")
+                    );
+
+                    card.appendChild(paragraph);
+                });
+
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "select-show-button";
+                button.textContent = "Select This Show";
+
+                button.addEventListener("click", () => {
+                    selectShow(show, card);
+                });
+
+                card.appendChild(button);
+                cinemaInfo.appendChild(card);
+            });
+
+            // Select a show automatically when opening a URL
+            // containing a valid showId parameter.
+            const requestedShowId = Number(params.get("showId"));
+
+            if (requestedShowId > 0) {
+                const requestedShow = shows.find(
+                    show => Number(show.id) === requestedShowId
+                );
+
+                if (requestedShow) {
+                    const cards = cinemaInfo.querySelectorAll(".show-card");
+                    const index = shows.findIndex(
+                        show => Number(show.id) === requestedShowId
+                    );
+
+                    selectShow(requestedShow, cards[index]);
+                }
+            }
+
+        } catch (error) {
+            console.error("Loading error:", error);
+            showError(error.message);
+        }
+    }
+
+    function showError(text) {
+        message.textContent = text;
+        message.style.color = "red";
+        confirmButton.disabled = true;
+    }
+
+    async function selectShow(show, card) {
+        selectedShow = show;
+
+        selectedSeats.clear();
+        selectedSeatsText.textContent = "None";
+        totalPriceText.textContent = "0";
+        confirmButton.disabled = true;
+        message.textContent = "";
+
+        cinemaInfo.querySelectorAll(".show-card").forEach(item => {
+            item.classList.remove("active-show");
+            const button = item.querySelector("button");
+            if (button) {
+                button.textContent = "Select This Show";
+            }
+        });
+
+        card.classList.add("active-show");
+        card.querySelector("button").textContent = "Selected";
+
+        pricePerSeat = Number(show.ticketPrice);
+
+        if (!Number.isFinite(pricePerSeat) || pricePerSeat <= 0) {
+            showError("Invalid ticket price for this show.");
+            seatSection.hidden = true;
+            return;
+        }
+
+        document.getElementById("selectedShowInfo").textContent =
+            show.cinemaName + " | " +
+            show.city + " | " +
+            show.showDate + " | " +
+            show.showTime + " | ₹" + pricePerSeat;
+
+        seatSection.hidden = false;
+
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+        }
+
+        await refreshBookedSeats();
+        createSeats();
+
+        refreshTimer = setInterval(async () => {
+            await refreshBookedSeats();
+        }, 5000);
+    }
+
+    async function refreshBookedSeats() {
+        if (!selectedShow) return;
+
+        try {
+            
+            const response = await fetch(
+            		"/api/bookings/show/" + selectedShow.id + "/booked-seats"
+            );
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const latestBookedSeats = new Set(data.bookedSeats || []);
+
+            latestBookedSeats.forEach(seatId => {
+                if (!bookedSeats.has(seatId)) {
+                    selectedSeats.delete(seatId);
+                }
+            });
+
+            bookedSeats = latestBookedSeats;
+
+            if (seatSection.hidden) return;
+
+            createSeats();
+
+            selectedSeatsText.textContent =
+                [...selectedSeats].join(", ") || "None";
+
+            totalPriceText.textContent =
+                selectedSeats.size * pricePerSeat;
+
+            confirmButton.disabled = selectedSeats.size === 0;
+
+        } catch (error) {
+            console.error("Could not refresh booked seats:", error);
+        }
+    }
+
+    function createSeats() {
+        seatLayout.replaceChildren();
+
+        const rows = ["A", "B", "C", "D", "E", "F"];
+
+        rows.forEach(row => {
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "seat-row";
+
+            const label = document.createElement("span");
+            label.className = "row-label";
+            label.textContent = row;
+            rowDiv.appendChild(label);
+
+            for (let number = 1; number <= 8; number++) {
+                const seatId = row + number;
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "seat";
+                button.textContent = number;
+                button.setAttribute("aria-label", "Seat " + seatId);
+
+                if (bookedSeats.has(seatId)) {
+                    button.classList.add("booked");
+                    button.disabled = true;
+                    button.title = "Already booked";
+                } else {
+                    if (selectedSeats.has(seatId)) {
+                        button.classList.add("selected");
+                    }
+
+                    button.addEventListener("click", () => {
+                        toggleSeat(seatId, button);
+                    });
+                }
+
+                rowDiv.appendChild(button);
+            }
+
+            seatLayout.appendChild(rowDiv);
+        });
+    }
+
+    function toggleSeat(seatId, button) {
+        if (bookedSeats.has(seatId)) {
+            return;
+        }
+
+        if (selectedSeats.has(seatId)) {
+            selectedSeats.delete(seatId);
+            button.classList.remove("selected");
+        } else {
+            if (selectedSeats.size >= 6) {
+                message.textContent = "You can select up to 6 seats.";
+                message.style.color = "red";
+                return;
+            }
+
+            selectedSeats.add(seatId);
+            button.classList.add("selected");
+        }
+
+        message.textContent = "";
+
+        selectedSeatsText.textContent =
+            [...selectedSeats].join(", ") || "None";
+
+        totalPriceText.textContent =
+            selectedSeats.size * pricePerSeat;
+
+        confirmButton.disabled = selectedSeats.size === 0;
+    }
+
+    confirmButton.addEventListener("click", () => {
+        if (!selectedShow || selectedSeats.size === 0) return;
+
+        const seats = [...selectedSeats].join(",");
+
+        window.location.href =
+            "/booking.html?type=MOVIE&id=" + movieId +
+            "&showId=" + selectedShow.id +
+            "&seats=" + encodeURIComponent(seats);
+    });
+
+    loadSeats();
+</script>
+
+</body>
+</html>

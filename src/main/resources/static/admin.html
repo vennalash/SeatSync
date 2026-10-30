@@ -1,0 +1,702 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync | Admin Dashboard</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20243a;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 250px;
+    background: #17152d;
+    color: white;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.logo span {
+    color: #a99bff;
+}
+
+.admin-label {
+    color: #aaa5c8;
+    font-size: 12px;
+    margin-bottom: 35px;
+}
+
+.nav-title {
+    color: #8f8aa9;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 15px 10px;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: block;
+    padding: 13px 14px;
+    color: #d3d0e3;
+    text-decoration: none;
+    border-radius: 9px;
+    margin-bottom: 7px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #6555dc;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #514b70;
+    background: transparent;
+    color: white;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background: #e34c65;
+    border-color: #e34c65;
+}
+
+/* MAIN */
+.main {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 30px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px;
+}
+
+.topbar h1 {
+    font-size: 27px;
+}
+
+.topbar p {
+    color: #888;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #6555dc;
+    color: white;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+}
+
+.admin-profile small {
+    display: block;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* WELCOME */
+.welcome {
+    background: linear-gradient(120deg, #5142d6, #8a79f5);
+    color: white;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+}
+
+.welcome h2 {
+    font-size: 23px;
+    margin-bottom: 9px;
+}
+
+.welcome p {
+    color: #e6e1ff;
+    font-size: 14px;
+}
+
+/* STATISTICS */
+.section-heading {
+    font-size: 19px;
+    margin: 25px 0 17px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.stat-card {
+    background: white;
+    padding: 23px;
+    border-radius: 14px;
+    box-shadow: 0 3px 18px #00000008;
+    border: 1px solid #eeeeF5;
+    transition: 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px #00000010;
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-icon {
+    width: 45px;
+    height: 45px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    font-size: 21px;
+}
+
+.purple { background: #eeeaff; }
+.blue { background: #e5f0ff; }
+.green { background: #e3f8ee; }
+.orange { background: #fff0df; }
+.pink { background: #ffe8ef; }
+.cyan { background: #e2f8fa; }
+
+.stat-number {
+    font-size: 31px;
+    font-weight: bold;
+    margin-top: 19px;
+}
+
+.stat-name {
+    color: #85859a;
+    font-size: 13px;
+}
+
+.stat-status {
+    color: #299b68;
+    font-size: 12px;
+    margin-top: 13px;
+}
+
+/* MANAGEMENT */
+.management-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 17px;
+}
+
+.management-card {
+    background: white;
+    padding: 22px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #eeeeF5;
+    text-decoration: none;
+    color: #20243a;
+    transition: 0.2s;
+}
+
+.management-card:hover {
+    transform: translateY(-3px);
+    border-color: #6555dc;
+    box-shadow: 0 7px 20px #6555dc18;
+}
+
+.management-card h3 {
+    font-size: 16px;
+    margin-bottom: 7px;
+}
+
+.management-card p {
+    font-size: 12px;
+    color: #888;
+}
+
+.management-action {
+    font-size: 12px;
+    color: #6555dc;
+    background: #eeeaff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* INFO */
+.info-panel {
+    margin-top: 5px;
+    padding: 23px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eeeeF5;
+}
+
+.info-panel h3 {
+    margin-bottom: 10px;
+}
+
+.info-panel p {
+    color: #777;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 10px;
+    color: #999;
+    font-size: 12px;
+}
+
+.menu-btn {
+    display: none;
+    border: none;
+    background: #6555dc;
+    color: white;
+    padding: 10px 13px;
+    border-radius: 8px;
+    font-size: 19px;
+    cursor: pointer;
+}
+
+@media(max-width: 950px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 650px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: 0.3s;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+        width: 100%;
+        padding: 18px;
+    }
+
+    .menu-btn {
+        display: block;
+    }
+
+    .topbar {
+        align-items: flex-start;
+    }
+
+    .topbar h1 {
+        font-size: 21px;
+    }
+
+    .admin-profile {
+        padding: 7px;
+    }
+
+    .admin-profile .profile-text {
+        display: none;
+    }
+
+    .stats-grid,
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome {
+        padding: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">Seat<span>Sync.</span></div>
+    <div class="admin-label">ADMINISTRATION PANEL</div>
+
+    <div class="nav-title">MAIN MENU</div>
+
+    <a class="nav-link active" href="/admin.html">◈ &nbsp; Overview</a>
+
+    <div class="nav-title">MANAGEMENT</div>
+
+    <a class="nav-link" href="/admin-movies.html">🎬 &nbsp; Movies</a>
+    <a class="nav-link" href="/admin-events.html">🎟 &nbsp; Events</a>
+    <a class="nav-link" href="/admin-hotels.html">🏨 &nbsp; Hotels</a>
+    <a class="nav-link" href="/admin-sports.html">🏆 &nbsp; Sports</a>
+    <a class="nav-link" href="/admin-bookings.html">📋 &nbsp; Bookings</a>
+    <a class="nav-link" href="/admin-users.html">👥 &nbsp; Users</a>
+
+    <div class="sidebar-bottom">
+        <button class="logout-btn" onclick="logout()">
+            ↪ &nbsp; Logout
+        </button>
+    </div>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="overview">
+
+    <div class="topbar">
+
+        <div style="display:flex;align-items:center;gap:13px">
+
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Monitor and manage your SeatSync platform.</p>
+            </div>
+
+        </div>
+
+        <div class="admin-profile">
+            <div class="avatar">A</div>
+            <div class="profile-text">
+                <strong id="adminName">Administrator</strong>
+                <small>Super Admin</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- WELCOME -->
+    <section class="welcome">
+        <h2 id="welcomeText">Welcome to SeatSync Admin 👋</h2>
+        <p>
+            Manage movies, events, hotels, sports facilities
+            and customer bookings from one place.
+        </p>
+    </section>
+
+    <!-- STATISTICS -->
+    <h2 class="section-heading">Platform Overview</h2>
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-name">TOTAL USERS</span>
+                <div class="stat-icon purple">👥</div>
+            </div>
+            <div class="stat-number" id="totalUsers">--</div>
+            <div class="stat-status">Registered users</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-name">TOTAL BOOKINGS</span>
+                <div class="stat-icon blue">🎟</div>
+            </div>
+            <div class="stat-number" id="totalBookings">--</div>
+            <div class="stat-status">All reservations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-name">TOTAL MOVIES</span>
+                <div class="stat-icon pink">🎬</div>
+            </div>
+            <div class="stat-number" id="totalMovies">--</div>
+            <div class="stat-status">Movies listed</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-name">TOTAL EVENTS</span>
+                <div class="stat-icon orange">🎫</div>
+            </div>
+            <div class="stat-number" id="totalEvents">--</div>
+            <div class="stat-status">Events listed</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-name">TOTAL HOTELS</span>
+                <div class="stat-icon green">🏨</div>
+            </div>
+            <div class="stat-number" id="totalHotels">--</div>
+            <div class="stat-status">Hotels listed</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <span class="stat-name">SPORTS FACILITIES</span>
+                <div class="stat-icon cyan">🏆</div>
+            </div>
+            <div class="stat-number" id="totalSportsFacilities">--</div>
+            <div class="stat-status">Facilities listed</div>
+        </div>
+
+    </section>
+
+    <!-- SERVICE MANAGEMENT -->
+    <section id="management">
+
+        <h2 class="section-heading">Manage Services</h2>
+
+        <div class="management-grid">
+
+            <a href="/admin-movies.html" class="management-card">
+                <div>
+                    <h3>🎬 Manage Movies</h3>
+                    <p>Add, edit, delete and manage movies.</p>
+                </div>
+                <span class="management-action">Manage →</span>
+            </a>
+
+            <a href="/admin-events.html" class="management-card">
+                <div>
+                    <h3>🎟 Manage Events</h3>
+                    <p>Add, edit, delete and manage events.</p>
+                </div>
+                <span class="management-action">Manage →</span>
+            </a>
+
+            <a href="/admin-hotels.html" class="management-card">
+                <div>
+                    <h3>🏨 Manage Hotels</h3>
+                    <p>Manage hotels and room availability.</p>
+                </div>
+                <span class="management-action">Manage →</span>
+            </a>
+
+            <a href="/admin-sports.html" class="management-card">
+                <div>
+                    <h3>🏆 Manage Sports</h3>
+                    <p>Manage sports facilities and hourly prices.</p>
+                </div>
+                <span class="management-action">Manage →</span>
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- BOOKING MANAGEMENT -->
+    <section id="bookings">
+
+        <h2 class="section-heading">Booking Management</h2>
+
+        <a href="/admin-bookings.html" class="management-card">
+
+            <div>
+                <h3>📋 All Customer Bookings</h3>
+                <p>View and manage all customer reservations.</p>
+                <p>Monitor booking references, customers, service types,
+                   payment amounts and booking statuses.</p>
+            </div>
+
+            <span class="management-action">Manage Bookings →</span>
+
+        </a>
+
+    </section>
+
+    <!-- USER MANAGEMENT -->
+    <section id="users">
+
+        <h2 class="section-heading">User Management</h2>
+
+        <a href="/admin-users.html" class="management-card">
+
+            <div>
+                <h3>👥 Registered Customers</h3>
+                <p>View registered customers and their account information.</p>
+                <p>Access customer management.</p>
+            </div>
+
+            <span class="management-action">Manage Users →</span>
+
+        </a>
+
+    </section>
+
+    <p id="message">Loading dashboard statistics...</p>
+
+    <footer>
+        © 2026 SeatSync. All rights reserved.
+        <br><br>
+        Admin Control Panel
+    </footer>
+
+</main>
+</div>
+
+<script>
+
+// CHECK LOGIN DETAILS
+const userId = sessionStorage.getItem("seatsyncUserId");
+const userRole = sessionStorage.getItem("seatsyncRole");
+const userName = sessionStorage.getItem("seatsyncName");
+
+document.getElementById("adminName").textContent =
+    userName || "Administrator";
+
+document.getElementById("welcomeText").textContent =
+    "Welcome, " + (userName || "Administrator") + " 👋";
+
+// LOAD DASHBOARD STATISTICS
+async function loadDashboard() {
+
+    const message = document.getElementById("message");
+
+    try {
+
+        const response = await fetch("/api/admin/dashboard", {
+            method: "GET",
+            credentials: "same-origin"
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            message.textContent =
+                "Access denied. Please log in with an administrator account.";
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Unable to load dashboard statistics.");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("totalUsers").textContent =
+            data.totalUsers ?? 0;
+
+        document.getElementById("totalBookings").textContent =
+            data.totalBookings ?? 0;
+
+        document.getElementById("totalMovies").textContent =
+            data.totalMovies ?? 0;
+
+        document.getElementById("totalEvents").textContent =
+            data.totalEvents ?? 0;
+
+        document.getElementById("totalHotels").textContent =
+            data.totalHotels ?? 0;
+
+        document.getElementById("totalSportsFacilities").textContent =
+            data.totalSportsFacilities ?? 0;
+
+        message.textContent = "Dashboard statistics updated successfully.";
+
+    } catch (error) {
+
+        message.textContent = error.message;
+        console.error("Dashboard error:", error);
+
+    }
+}
+
+// LOGOUT
+async function logout() {
+
+    try {
+
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+
+    } catch (error) {
+
+        console.error("Logout request failed:", error);
+
+    }
+
+    sessionStorage.removeItem("seatsyncUserId");
+    sessionStorage.removeItem("seatsyncName");
+    sessionStorage.removeItem("seatsyncEmail");
+    sessionStorage.removeItem("seatsyncRole");
+
+    window.location.href = "/login.html";
+}
+
+// MOBILE MENU
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("open");
+}
+
+// LOAD DASHBOARD
+loadDashboard();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync - User Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20213a;
+}
+
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: #17152f;
+    color: white;
+    position: fixed;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #aaa5dc;
+    font-size: 12px;
+    margin-bottom: 50px;
+}
+
+.menu-label {
+    color: #9893c4;
+    font-size: 11px;
+    margin: 20px 10px 15px;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 13px;
+    border-radius: 9px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #6553df;
+}
+
+.logout {
+    margin-top: auto;
+    border: 1px solid #514b75;
+    text-align: center;
+    cursor: pointer;
+}
+
+.main {
+    margin-left: 240px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 27px;
+}
+
+.header p {
+    color: #777;
+    margin-top: 7px;
+}
+
+.admin {
+    background: white;
+    padding: 15px 22px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 23px;
+    border-radius: 14px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.stat-card p {
+    color: #777;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    font-size: 28px;
+    margin-top: 12px;
+}
+
+.content {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px #00000008;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.filters input,
+.filters select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    background: white;
+}
+
+.filters input {
+    width: 300px;
+}
+
+button {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.refresh {
+    background: #6553df;
+    color: white;
+}
+
+.view-btn {
+    background: #ece9ff;
+    color: #5743ce;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th {
+    background: #f6f5fb;
+    text-align: left;
+    padding: 16px 12px;
+    color: #555;
+    font-size: 13px;
+}
+
+td {
+    padding: 17px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+tr:hover {
+    background: #fafaff;
+}
+
+.avatar {
+    width: 37px;
+    height: 37px;
+    border-radius: 50%;
+    background: #e9e5ff;
+    color: #6553df;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-right: 9px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.role {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.CUSTOMER {
+    background: #e4f1ff;
+    color: #2372c4;
+}
+
+.ADMIN {
+    background: #eee6ff;
+    color: #7040bd;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.empty {
+    text-align: center;
+    padding: 35px;
+    color: #888;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 10;
+}
+
+.modal-box {
+    background: white;
+    padding: 28px;
+    width: 420px;
+    max-width: 100%;
+    border-radius: 15px;
+}
+
+.modal-box h2 {
+    margin-bottom: 20px;
+}
+
+.detail-row {
+    padding: 13px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.detail-row strong {
+    display: inline-block;
+    width: 100px;
+}
+
+.close {
+    background: #6553df;
+    color: white;
+    margin-top: 20px;
+    width: 100%;
+}
+
+@media(max-width: 900px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        margin-left: 190px;
+        padding: 20px;
+    }
+}
+
+@media(max-width: 600px) {
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">SeatSync.</div>
+    <div class="subtitle">ADMINISTRATION PANEL</div>
+
+    <div class="menu-label">MAIN MENU</div>
+
+    <a href="/admin.html">◇ Overview</a>
+
+    <div class="menu-label">MANAGEMENT</div>
+
+    <a href="/admin-movies.html">🎬 Movies</a>
+    <a href="/admin-events.html">🎟 Events</a>
+    <a href="/admin-hotels.html">🏨 Hotels</a>
+    <a href="/admin-sports.html">🏆 Sports</a>
+    <a href="/admin-bookings.html">📋 Bookings</a>
+    <a href="/admin-users.html" class="active">👥 Users</a>
+
+    <a class="logout" onclick="logout()">↪ Logout</a>
+
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>User Management 👥</h1>
+            <p>View and manage registered SeatSync users.</p>
+        </div>
+
+        <div class="admin">SeatSync Admin</div>
+    </div>
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <p>Total Users</p>
+            <h2 id="totalUsers">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Customers</p>
+            <h2 id="customerCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Administrators</p>
+            <h2 id="adminCount">0</h2>
+        </div>
+
+    </div>
+
+    <section class="content">
+
+        <div class="content-header">
+            <h2>All Registered Users</h2>
+
+            <button class="refresh" onclick="loadUsers()">
+                ↻ Refresh
+            </button>
+        </div>
+
+        <div class="filters">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by name or email..."
+                oninput="applyFilters()">
+
+            <select id="roleFilter" onchange="applyFilters()">
+                <option value="">All Roles</option>
+                <option value="CUSTOMER">Customers</option>
+                <option value="ADMIN">Admins</option>
+            </select>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>User ID</th>
+                        <th>Email Address</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="userTable">
+                    <tr>
+                        <td colspan="5" class="empty">
+                            Loading users...
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<div class="modal" id="detailsModal">
+
+    <div class="modal-box">
+
+        <h2>User Details</h2>
+
+        <div id="userDetails"></div>
+
+        <button class="close" onclick="closeModal()">
+            Close
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+let allUsers = [];
+
+async function loadUsers() {
+
+    const table = document.getElementById("userTable");
+
+    table.innerHTML =
+        '<tr><td colspan="5" class="empty">Loading users...</td></tr>';
+
+    try {
+
+        const response = await fetch(
+            "/api/users/admin/all",
+            { credentials: "same-origin" }
+        );
+
+        if (!response.ok) {
+
+            if (response.status === 403) {
+                throw new Error("Admin access denied. Please login again.");
+            }
+
+            throw new Error("Unable to load users.");
+        }
+
+        allUsers = await response.json();
+
+        updateStats();
+        applyFilters();
+
+    } catch (error) {
+
+        table.innerHTML =
+            `<tr><td colspan="5" class="empty">${escapeHTML(error.message)}</td></tr>`;
+
+    }
+}
+
+function updateStats() {
+
+    document.getElementById("totalUsers").textContent =
+        allUsers.length;
+
+    document.getElementById("customerCount").textContent =
+        allUsers.filter(u => u.role === "CUSTOMER").length;
+
+    document.getElementById("adminCount").textContent =
+        allUsers.filter(u => u.role === "ADMIN").length;
+}
+
+function applyFilters() {
+
+    const keyword =
+        document.getElementById("searchInput")
+            .value.trim().toLowerCase();
+
+    const role =
+        document.getElementById("roleFilter").value;
+
+    const filtered = allUsers.filter(user => {
+
+        const name = (user.name || "").toLowerCase();
+        const email = (user.email || "").toLowerCase();
+
+        const matchesSearch =
+            name.includes(keyword) || email.includes(keyword);
+
+        const matchesRole =
+            !role || user.role === role;
+
+        return matchesSearch && matchesRole;
+    });
+
+    displayUsers(filtered);
+}
+
+function displayUsers(users) {
+
+    const table = document.getElementById("userTable");
+
+    if (users.length === 0) {
+
+        table.innerHTML =
+            '<tr><td colspan="5" class="empty">No users found.</td></tr>';
+
+        return;
+    }
+
+    table.innerHTML = users.map(user => {
+
+        const name = user.name || "Unknown";
+        const initial = name.charAt(0).toUpperCase();
+        const role = user.role || "CUSTOMER";
+
+        return `
+        <tr>
+
+            <td>
+                <div class="user-info">
+                    <span class="avatar">${escapeHTML(initial)}</span>
+                    <strong>${escapeHTML(name)}</strong>
+                </div>
+            </td>
+
+            <td>${escapeHTML(user.id)}</td>
+
+            <td>${escapeHTML(user.email)}</td>
+
+            <td>
+                <span class="role ${role}">
+                    ${escapeHTML(role)}
+                </span>
+            </td>
+
+            <td>
+                <button class="view-btn"
+                    onclick="viewUser(${Number(user.id)})">
+                    View Details
+                </button>
+            </td>
+
+        </tr>
+        `;
+
+    }).join("");
+}
+
+function viewUser(id) {
+
+    const user = allUsers.find(
+        u => Number(u.id) === id
+    );
+
+    if (!user) return;
+
+    const details = [
+        ["User ID", user.id],
+        ["Name", user.name],
+        ["Email", user.email],
+        ["Role", user.role]
+    ];
+
+    document.getElementById("userDetails").innerHTML =
+        details.map(([label, value]) => `
+            <div class="detail-row">
+                <strong>${escapeHTML(label)}:</strong>
+                ${escapeHTML(value)}
+            </div>
+        `).join("");
+
+    document.getElementById("detailsModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("detailsModal").style.display = "none";
+}
+
+function escapeHTML(value) {
+
+    return String(value ?? "-").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+
+}
+
+async function logout() {
+
+    try {
+
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+
+    } finally {
+
+        sessionStorage.clear();
+        window.location.href = "/login.html";
+
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    if (
+        !sessionStorage.getItem("seatsyncUserId") ||
+        sessionStorage.getItem("seatsyncRole") !== "ADMIN"
+    ) {
+        window.location.href = "/login.html";
+        return;
+    }
+
+    loadUsers();
+
+});
+
+</script>
+
+</body>
+</html>

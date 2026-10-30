@@ -1,0 +1,481 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeatSync - Sports & Turf</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f5f6ff;
+            color: #25204a;
+        }
+
+        header {
+            background: #25204a;
+            color: white;
+            padding: 20px 8%;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header p {
+            margin-bottom: 0;
+        }
+
+        main {
+            padding: 35px 8%;
+        }
+
+        .intro {
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            color: #25204a;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #6254e8;
+            color: white;
+        }
+
+        #sportsList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+        }
+
+        .sports-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 18px #00000012;
+            transition: 0.3s;
+        }
+
+        .sports-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px #00000020;
+        }
+
+        .sports-card img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h2 {
+            margin: 0 0 12px;
+            color: #25204a;
+        }
+
+        .sport-tag {
+            display: inline-block;
+            background: #eeecff;
+            color: #6254e8;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .card-content p {
+            color: #666;
+            margin: 9px 0;
+            font-size: 14px;
+        }
+
+        .price {
+            color: #25204a !important;
+            font-size: 19px !important;
+            font-weight: bold;
+            margin-top: 15px !important;
+        }
+
+        .sports-card button {
+            width: 100%;
+            background: #6254e8;
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .sports-card button:hover {
+            background: #493bc5;
+        }
+
+        #message {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px;
+            color: #777;
+            grid-column: 1 / -1;
+        }
+
+        @media(max-width: 600px) {
+            main {
+                padding: 25px 5%;
+            }
+
+            header {
+                padding: 20px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1><a href="/index.html">SeatSync</a></h1>
+    <p>Find and book your favorite sports facilities</p>
+</header>
+
+<main>
+
+    <div class="intro">
+        <h1>Sports & Turf Booking</h1>
+        <p>Explore sports facilities and book your favorite game.</p>
+    </div>
+
+    <input
+        type="text"
+        id="searchInput"
+        class="search-box"
+        placeholder="Search sports, facilities or city..."
+        oninput="filterSports()"
+    >
+
+    <div class="filters" id="filters">
+        <button class="filter-btn active"
+                onclick="selectFilter('ALL', this)">
+            All Sports
+        </button>
+    </div>
+
+    <p id="message">Loading sports facilities...</p>
+
+    <div id="sportsList"></div>
+
+</main>
+
+<script>
+
+    let allFacilities = [];
+    let selectedSport = "ALL";
+
+    const sportImages = {
+    	    badminton:
+    	        "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800",
+
+    	    cricket:
+    	        "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800",
+
+    	    football:
+    	        "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800",
+
+    	    soccer:
+    	        "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800",
+
+    	    tennis:
+    	        "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800",
+
+    	    basketball:
+    	        "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800",
+
+    	    swimming:
+    	        "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800",
+
+    	    volleyball:
+    	        "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800",
+
+    	    tabletennis:
+    	        "https://images.unsplash.com/photo-1611251135345-18c56206b863?w=800",
+
+    	    golf:
+    	        "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800",
+
+    	    pickleball:
+    	        "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=800",
+
+    	    squash:
+    	        "https://images.unsplash.com/photo-1593786481097-3c6f5c2f7a5b?w=800",
+
+    	    boxcricket:
+    	        "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800",
+
+    	    indoorcricket:
+    	        "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800",
+
+    	    default:
+    	        "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800"
+    	};
+
+    function getSportImage(sportType) {
+
+        const sport = (sportType || "").toLowerCase()
+            .replace(/[^a-z]/g, "");
+
+        return sportImages[sport] || sportImages.default;
+    }
+
+    async function loadSports() {
+
+        const list = document.getElementById("sportsList");
+        const message = document.getElementById("message");
+
+        try {
+
+            const response = await fetch("/api/sports");
+
+            if (!response.ok) {
+                throw new Error("Could not load sports facilities");
+            }
+
+            const facilities = await response.json();
+
+            allFacilities = facilities;
+
+            if (!Array.isArray(facilities) || facilities.length === 0) {
+                message.textContent = "No sports facilities available yet.";
+                list.innerHTML = "";
+                return;
+            }
+
+            message.textContent =
+                facilities.length + " facility/facilities available.";
+
+            createFilters();
+            displaySports(facilities);
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "Unable to load sports facilities. Please try again.";
+
+        }
+    }
+
+    function createFilters() {
+
+        const filters = document.getElementById("filters");
+
+        filters.innerHTML = `
+            <button class="filter-btn active"
+                    onclick="selectFilter('ALL', this)">
+                All Sports
+            </button>
+        `;
+
+        const sports = [
+            ...new Set(
+                allFacilities
+                    .map(f => f.sportType)
+                    .filter(Boolean)
+            )
+        ];
+
+        sports.forEach(sport => {
+
+            const button = document.createElement("button");
+
+            button.className = "filter-btn";
+            button.textContent = sport;
+
+            button.onclick = function() {
+                selectFilter(sport, this);
+            };
+
+            filters.appendChild(button);
+
+        });
+    }
+
+    function selectFilter(sport, button) {
+
+        selectedSport = sport;
+
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        filterSports();
+    }
+
+    function filterSports() {
+
+        const search =
+            document.getElementById("searchInput")
+                .value.toLowerCase().trim();
+
+        const filtered = allFacilities.filter(facility => {
+
+            const matchesSport =
+                selectedSport === "ALL" ||
+                (facility.sportType || "").toLowerCase() ===
+                selectedSport.toLowerCase();
+
+            const searchableText = [
+                facility.name,
+                facility.sportType,
+                facility.city,
+                facility.address
+            ].join(" ").toLowerCase();
+
+            const matchesSearch = searchableText.includes(search);
+
+            return matchesSport && matchesSearch;
+
+        });
+
+        displaySports(filtered);
+    }
+
+    function displaySports(facilities) {
+
+        const list = document.getElementById("sportsList");
+        const message = document.getElementById("message");
+
+        list.innerHTML = "";
+
+        if (facilities.length === 0) {
+
+            list.innerHTML = `
+                <div class="empty">
+                    <h2>No facilities found</h2>
+                    <p>Try another sport or search keyword.</p>
+                </div>
+            `;
+
+            message.textContent = "0 facilities found.";
+            return;
+        }
+
+        message.textContent =
+            facilities.length + " facility/facilities available.";
+
+        facilities.forEach(facility => {
+
+            const card = document.createElement("div");
+            card.className = "sports-card";
+
+            const img = document.createElement("img");
+            img.src = getSportImage(facility.sportType);
+            img.alt = facility.sportType || "Sports facility";
+            img.loading = "lazy";
+
+            img.onerror = function() {
+                this.onerror = null;
+                this.src = sportImages.default;
+            };
+
+            const content = document.createElement("div");
+            content.className = "card-content";
+
+            const title = document.createElement("h2");
+            title.textContent = facility.name;
+
+            const tag = document.createElement("span");
+            tag.className = "sport-tag";
+            tag.textContent = facility.sportType || "Sports";
+
+            const city = document.createElement("p");
+            city.textContent = "📍 City: " + (facility.city || "N/A");
+
+            const address = document.createElement("p");
+            address.textContent =
+                "Address: " + (facility.address || "N/A");
+
+            const price = document.createElement("p");
+            price.className = "price";
+            price.textContent =
+                "₹" + (facility.pricePerHour ?? "N/A") + " / hour";
+
+            const button = document.createElement("button");
+            button.textContent = "Book Now";
+
+            button.onclick = function() {
+                window.location.href =
+                    "/booking.html?type=SPORTS&id=" +
+                    encodeURIComponent(facility.id);
+            };
+
+            content.append(
+                tag,
+                title,
+                city,
+                address,
+                price,
+                button
+            );
+
+            card.append(img, content);
+
+            list.appendChild(card);
+
+        });
+    }
+
+    loadSports();
+
+</script>
+
+</body>
+</html>

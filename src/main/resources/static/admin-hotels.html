@@ -1,0 +1,955 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeatSync | Admin Hotel Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f5fb;
+    color: #20243a;
+}
+
+.sidebar {
+    width: 245px;
+    background: #17152d;
+    color: white;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.logo span {
+    color: #a99bff;
+}
+
+.sidebar small {
+    color: #aaa5c8;
+    margin-bottom: 35px;
+}
+
+.nav-title {
+    font-size: 11px;
+    color: #8984a5;
+    margin: 18px 10px 12px;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    display: block;
+    padding: 13px;
+    margin-bottom: 7px;
+    color: #d3d0e3;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #6555dc;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.logout {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    color: white;
+    border: 1px solid #514b70;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background: #df465f;
+}
+
+.main {
+    margin-left: 245px;
+    padding: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    gap: 15px;
+}
+
+.header h1 {
+    font-size: 27px;
+}
+
+.header p {
+    color: #888;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+.admin-profile {
+    background: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #eeeef5;
+    border-radius: 13px;
+    padding: 22px;
+}
+
+.stat-card p {
+    color: #888;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    font-size: 30px;
+    margin-top: 12px;
+}
+
+.panel {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #eeeef5;
+    padding: 24px;
+    margin-bottom: 25px;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    font-size: 19px;
+}
+
+button {
+    cursor: pointer;
+}
+
+.add-btn {
+    background: #6555dc;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-btn:hover {
+    background: #4c3bc5;
+}
+
+.search {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f7f6fc;
+    padding: 14px;
+    text-align: left;
+    color: #777;
+    font-size: 12px;
+}
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-active {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.status-inactive {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.action-btn {
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    margin: 2px;
+    font-size: 12px;
+}
+
+.edit-btn {
+    color: #6555dc;
+    background: #eeeaff;
+}
+
+.deactivate-btn {
+    color: #d23b3b;
+    background: #ffe7e7;
+}
+
+.activate-btn {
+    color: #16864e;
+    background: #e1f7eb;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    padding: 35px;
+}
+
+#message {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #777;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #0008;
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.field input,
+.field textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 85px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.cancel-btn {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #eee;
+}
+
+@media(max-width:850px) {
+    .sidebar {
+        width: 190px;
+    }
+
+    .main {
+        margin-left: 190px;
+        padding: 20px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width:600px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-bottom {
+        margin-top: 20px;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">Seat<span>Sync.</span></div>
+    <small>ADMINISTRATION PANEL</small>
+
+    <div class="nav-title">MAIN MENU</div>
+    <a href="/admin.html" class="nav-link">◈ Overview</a>
+
+    <div class="nav-title">MANAGEMENT</div>
+
+    <a href="/admin-movies.html" class="nav-link">🎬 Movies</a>
+    <a href="/admin-events.html" class="nav-link">🎟 Events</a>
+    <a href="/admin-hotels.html" class="nav-link active">🏨 Hotels</a>
+    <a href="/admin.html#management" class="nav-link">🏆 Sports</a>
+    <a href="/admin.html#bookings" class="nav-link">📋 Bookings</a>
+    <a href="/admin.html#users" class="nav-link">👥 Users</a>
+
+    <div class="sidebar-bottom">
+        <button class="logout" onclick="logout()">↪ Logout</button>
+    </div>
+
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>Hotel Management 🏨</h1>
+            <p>Manage all hotels available on SeatSync.</p>
+        </div>
+
+        <div class="admin-profile" id="adminName">
+            Administrator
+        </div>
+    </div>
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <p>Total Hotels</p>
+            <h2 id="totalHotels">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Active Hotels</p>
+            <h2 id="activeHotels">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <p>Inactive Hotels</p>
+            <h2 id="inactiveHotels">0</h2>
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h2>All Hotels</h2>
+
+            <button class="add-btn" onclick="openAddForm()">
+                + Add New Hotel
+            </button>
+        </div>
+
+        <div class="panel-header">
+            <input
+                type="text"
+                id="searchInput"
+                class="search"
+                placeholder="Search hotel by name or city..."
+                oninput="searchHotels()">
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Hotel Name</th>
+                        <th>City</th>
+                        <th>Address</th>
+                        <th>Price/Night</th>
+                        <th>Available Rooms</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="hotelTable">
+                    <tr>
+                        <td colspan="8" class="empty">
+                            Loading hotels...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <p id="message"></p>
+
+    </section>
+
+</main>
+
+<!-- ADD / EDIT HOTEL MODAL -->
+
+<div class="modal" id="hotelModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h2 id="modalTitle">Add New Hotel</h2>
+            <button class="close-btn" onclick="closeForm()">×</button>
+        </div>
+
+        <form id="hotelForm">
+
+            <input type="hidden" id="hotelId">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Hotel Name *</label>
+                    <input id="name" required>
+                </div>
+
+                <div class="field">
+                    <label>City *</label>
+                    <input id="city" required>
+                </div>
+
+                <div class="field full">
+                    <label>Address *</label>
+                    <input id="address" required>
+                </div>
+
+                <div class="field">
+                    <label>Price Per Night (₹) *</label>
+                    <input
+                        id="pricePerNight"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label>Available Rooms *</label>
+                    <input
+                        id="availableRooms"
+                        type="number"
+                        min="0"
+                        step="1"
+                        required>
+                </div>
+
+                <div class="field full">
+                    <label>Description</label>
+                    <textarea id="description"
+                        placeholder="Enter hotel description..."></textarea>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button type="button" class="cancel-btn"
+                    onclick="closeForm()">
+                    Cancel
+                </button>
+
+                <button type="submit" class="add-btn" id="saveBtn">
+                    Add Hotel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+// ADMIN SESSION
+
+const userId = sessionStorage.getItem("seatsyncUserId");
+const role = sessionStorage.getItem("seatsyncRole");
+
+if (!userId || role !== "ADMIN") {
+    alert("Please login with your admin account.");
+    window.location.href = "/login.html";
+}
+
+document.getElementById("adminName").textContent =
+    sessionStorage.getItem("seatsyncName") || "Administrator";
+
+let allHotels = [];
+
+// SAFE TEXT
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+// LOAD HOTELS
+
+async function loadHotels() {
+
+    const table = document.getElementById("hotelTable");
+
+    table.innerHTML =
+        '<tr><td colspan="8" class="empty">Loading hotels...</td></tr>';
+
+    try {
+
+        const response = await fetch("/api/hotels/admin/all", {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                response.status === 403
+                    ? "Admin access denied. Please login again."
+                    : "Unable to load hotels."
+            );
+        }
+
+        allHotels = await response.json();
+
+        updateStats();
+        displayHotels(allHotels);
+
+        document.getElementById("message").textContent =
+            "Hotels loaded successfully.";
+
+    } catch (error) {
+
+        table.innerHTML =
+            '<tr><td colspan="8" class="empty">Unable to load hotels.</td></tr>';
+
+        document.getElementById("message").textContent = error.message;
+    }
+}
+
+// UPDATE STATISTICS
+
+function updateStats() {
+
+    const active = allHotels.filter(hotel => hotel.active);
+    const inactive = allHotels.filter(hotel => !hotel.active);
+
+    document.getElementById("totalHotels").textContent =
+        allHotels.length;
+
+    document.getElementById("activeHotels").textContent =
+        active.length;
+
+    document.getElementById("inactiveHotels").textContent =
+        inactive.length;
+}
+
+// DISPLAY HOTELS
+
+function displayHotels(hotels) {
+
+    const table = document.getElementById("hotelTable");
+
+    if (!hotels.length) {
+        table.innerHTML =
+            '<tr><td colspan="8" class="empty">No hotels found.</td></tr>';
+        return;
+    }
+
+    table.innerHTML = hotels.map(hotel => {
+
+        const status = hotel.active
+            ? '<span class="status status-active">Active</span>'
+            : '<span class="status status-inactive">Inactive</span>';
+
+        const action = hotel.active
+            ? `<button class="action-btn deactivate-btn"
+                onclick="changeStatus(${hotel.id}, false)">
+                Deactivate
+              </button>`
+            : `<button class="action-btn activate-btn"
+                onclick="changeStatus(${hotel.id}, true)">
+                Activate
+              </button>`;
+
+        return `
+            <tr>
+                <td>${hotel.id}</td>
+                <td><strong>${escapeHTML(hotel.name)}</strong></td>
+                <td>${escapeHTML(hotel.city || "-")}</td>
+                <td>${escapeHTML(hotel.address || "-")}</td>
+                <td>₹${Number(hotel.pricePerNight || 0).toFixed(2)}</td>
+                <td>${hotel.availableRooms ?? 0}</td>
+                <td>${status}</td>
+                <td>
+                    <button class="action-btn edit-btn"
+                        onclick="editHotel(${hotel.id})">
+                        Edit
+                    </button>
+                    ${action}
+                </td>
+            </tr>
+        `;
+
+    }).join("");
+}
+
+// SEARCH HOTELS
+
+async function searchHotels() {
+
+    const keyword = document.getElementById("searchInput")
+        .value.trim();
+
+    if (!keyword) {
+        displayHotels(allHotels);
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            "/api/hotels/admin/search?keyword=" +
+            encodeURIComponent(keyword),
+            { credentials: "same-origin" }
+        );
+
+        if (!response.ok) {
+            throw new Error("Search failed.");
+        }
+
+        const results = await response.json();
+
+        displayHotels(results);
+
+    } catch (error) {
+
+        document.getElementById("message").textContent =
+            error.message;
+    }
+}
+
+// OPEN ADD FORM
+
+function openAddForm() {
+
+    document.getElementById("hotelForm").reset();
+    document.getElementById("hotelId").value = "";
+
+    document.getElementById("modalTitle").textContent =
+        "Add New Hotel";
+
+    document.getElementById("saveBtn").textContent =
+        "Add Hotel";
+
+    document.getElementById("hotelModal").classList.add("show");
+}
+
+// EDIT HOTEL
+
+function editHotel(id) {
+
+    const hotel = allHotels.find(item => item.id === id);
+
+    if (!hotel) return;
+
+    document.getElementById("hotelId").value = hotel.id;
+    document.getElementById("name").value = hotel.name || "";
+    document.getElementById("city").value = hotel.city || "";
+    document.getElementById("address").value = hotel.address || "";
+
+    document.getElementById("pricePerNight").value =
+        hotel.pricePerNight ?? "";
+
+    document.getElementById("availableRooms").value =
+        hotel.availableRooms ?? "";
+
+    document.getElementById("description").value =
+        hotel.description || "";
+
+    document.getElementById("modalTitle").textContent =
+        "Edit Hotel";
+
+    document.getElementById("saveBtn").textContent =
+        "Update Hotel";
+
+    document.getElementById("hotelModal").classList.add("show");
+}
+
+// CLOSE FORM
+
+function closeForm() {
+    document.getElementById("hotelModal").classList.remove("show");
+}
+
+// ADD OR UPDATE HOTEL
+
+document.getElementById("hotelForm").addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const id = document.getElementById("hotelId").value;
+
+        const hotelData = {
+
+            name: document.getElementById("name").value.trim(),
+
+            city: document.getElementById("city").value.trim(),
+
+            address: document.getElementById("address").value.trim(),
+
+            pricePerNight: Number(
+                document.getElementById("pricePerNight").value
+            ),
+
+            availableRooms: Number(
+                document.getElementById("availableRooms").value
+            ),
+
+            description: document.getElementById("description").value.trim()
+        };
+
+        const saveBtn = document.getElementById("saveBtn");
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+
+        try {
+
+            const response = await fetch(
+                id ? "/api/hotels/" + id : "/api/hotels",
+                {
+                    method: id ? "PUT" : "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify(hotelData)
+                }
+            );
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || "Unable to save hotel.");
+            }
+
+            alert(id
+                ? "Hotel updated successfully!"
+                : "Hotel added successfully!"
+            );
+
+            closeForm();
+
+            document.getElementById("searchInput").value = "";
+
+            await loadHotels();
+
+        } catch (error) {
+
+            alert(error.message);
+
+        } finally {
+
+            saveBtn.disabled = false;
+            saveBtn.textContent = id ? "Update Hotel" : "Add Hotel";
+        }
+    }
+);
+
+// ACTIVATE / DEACTIVATE
+
+async function changeStatus(id, activate) {
+
+    const action = activate ? "activate" : "deactivate";
+
+    if (!confirm("Are you sure you want to " + action + " this hotel?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            activate
+                ? `/api/hotels/${id}/activate`
+                : `/api/hotels/${id}`,
+            {
+                method: activate ? "PUT" : "DELETE",
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to " + action + " hotel.");
+        }
+
+        alert("Hotel " + action + "d successfully!");
+
+        document.getElementById("searchInput").value = "";
+
+        await loadHotels();
+
+    } catch (error) {
+
+        alert(error.message);
+    }
+}
+
+// LOGOUT
+
+async function logout() {
+
+    try {
+        await fetch("/api/users/logout", {
+            method: "POST",
+            credentials: "same-origin"
+        });
+    } catch (error) {
+        console.error(error);
+    }
+
+    sessionStorage.clear();
+    window.location.href = "/login.html";
+}
+
+// START
+
+loadHotels();
+
+</script>
+
+</body>
+</html>
